@@ -63,6 +63,7 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenName>('splash');
   const [session, setSession] = useState<any>(null);
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
+  const [hasActiveOrder, setHasActiveOrder] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -116,9 +117,9 @@ export default function App() {
       case 'booking':
         return <BookingScreen providerId={selectedProvider} onNavigate={setCurrentScreen} />;
       case 'payment':
-        return <PaymentScreen onNavigate={setCurrentScreen} />;
+        return <PaymentScreen onNavigate={setCurrentScreen} onPaymentSuccess={() => setHasActiveOrder(true)} />;
       case 'tracking':
-        return <TrackingScreen onNavigate={setCurrentScreen} />;
+        return <TrackingScreen onNavigate={setCurrentScreen} hasActiveOrder={hasActiveOrder} />;
       case 'edit-profile':
         return <GenericSettingsScreen title="Edit Profile" onNavigate={setCurrentScreen} />;
       case 'addresses':

@@ -9,10 +9,7 @@ export default function SplashScreen() {
         />
         
         <div className="w-10 h-10 border-4 border-bg-elevated border-t-accent-primary rounded-full animate-spin"></div>
-      </div>
-      
-      <div className="pb-12">
-        <p className="text-[15px] italic text-text-secondary">Laundry made effortless</p>
+        <p className="text-[15px] italic text-text-secondary mt-4">Laundry made effortless</p>
       </div>
     </div>
   );
