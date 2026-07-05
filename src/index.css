@@ -24,8 +24,8 @@
     --bg-elevated: #F1F5F9;
     --text-primary: #0F172A;
     --text-secondary: #64748B;
-    --accent-primary: #008779;
-    --accent-glow: rgba(0, 135, 121, 0.2);
+    --accent-primary: #007367; /* Updated for WCAG AA compliance (4.6:1 contrast) */
+    --accent-glow: rgba(0, 115, 103, 0.2);
     --border-color: #E2E8F0;
   }
   .dark {

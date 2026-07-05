@@ -64,6 +64,8 @@ export default function App() {
   const [session, setSession] = useState<any>(null);
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
   const [hasActiveOrder, setHasActiveOrder] = useState(false);
+  const [activeOrderDetails, setActiveOrderDetails] = useState<{date: string, time: string} | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<string>('card');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -115,11 +117,11 @@ export default function App() {
       case 'provider':
         return <ProviderProfile providerId={selectedProvider} onNavigate={setCurrentScreen} />;
       case 'booking':
-        return <BookingScreen providerId={selectedProvider} onNavigate={setCurrentScreen} />;
+        return <BookingScreen providerId={selectedProvider} onNavigate={setCurrentScreen} onBookingComplete={setActiveOrderDetails} />;
       case 'payment':
-        return <PaymentScreen onNavigate={setCurrentScreen} onPaymentSuccess={() => setHasActiveOrder(true)} />;
+        return <PaymentScreen onNavigate={setCurrentScreen} onPaymentSuccess={(method) => { setHasActiveOrder(true); setPaymentMethod(method); }} />;
       case 'tracking':
-        return <TrackingScreen onNavigate={setCurrentScreen} hasActiveOrder={hasActiveOrder} />;
+        return <TrackingScreen onNavigate={setCurrentScreen} hasActiveOrder={hasActiveOrder} activeOrderDetails={activeOrderDetails} paymentMethod={paymentMethod} />;
       case 'edit-profile':
         return <GenericSettingsScreen title="Edit Profile" onNavigate={setCurrentScreen} />;
       case 'addresses':

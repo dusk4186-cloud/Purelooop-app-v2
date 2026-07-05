@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, MapPin, Edit3, Plus, X } from 'lucide-react';
 import type { ScreenName } from '../App';
 import { providersData } from '../lib/mockData';
@@ -6,13 +6,49 @@ import { providersData } from '../lib/mockData';
 interface BookingScreenProps {
   providerId: string | null;
   onNavigate: (screen: ScreenName) => void;
+  onBookingComplete?: (details: {date: string, time: string}) => void;
 }
 
-export default function BookingScreen({ providerId, onNavigate }: BookingScreenProps) {
+export default function BookingScreen({ providerId, onNavigate, onBookingComplete }: BookingScreenProps) {
   const provider = providersData.find(p => p.id === providerId) || providersData[0];
   
   const [activeServices, setActiveServices] = useState<string[]>(['Wash']);
   const [activeTime, setActiveTime] = useState('09:00 AM');
+  const [activeDate, setActiveDate] = useState<'Today' | 'Tomorrow'>('Today');
+
+  // Helper to check if a time slot is available
+  const isTimeSlotAvailable = (timeString: string) => {
+    if (activeDate === 'Tomorrow') return true;
+    
+    // Convert timeString (e.g. '02:00 PM') to 24h hour
+    const match = timeString.match(/(\d+):(\d+)\s+(AM|PM)/);
+    if (!match) return true;
+    
+    let hour = parseInt(match[1]);
+    const ampm = match[3];
+    if (ampm === 'PM' && hour < 12) hour += 12;
+    if (ampm === 'AM' && hour === 12) hour = 0;
+    
+    const currentHour = new Date().getHours();
+    // Disable if current hour is greater than or equal to the slot hour
+    return currentHour < hour;
+  };
+
+  const timeSlots = ['09:00 AM', '11:00 AM', '02:00 PM', '04:00 PM'];
+  
+  useEffect(() => {
+    if (activeDate === 'Today') {
+      const hasAvailableSlots = timeSlots.some(t => isTimeSlotAvailable(t));
+      if (!hasAvailableSlots) {
+        setActiveDate('Tomorrow');
+        setActiveTime('09:00 AM');
+      } else if (!isTimeSlotAvailable(activeTime)) {
+        // Switch to the first available time today
+        const firstAvailable = timeSlots.find(t => isTimeSlotAvailable(t));
+        if (firstAvailable) setActiveTime(firstAvailable);
+      }
+    }
+  }, [activeDate, activeTime]);
   
   const [items, setItems] = useState({
     // Top Wear
@@ -217,22 +253,52 @@ export default function BookingScreen({ providerId, onNavigate }: BookingScreenP
 
         {/* Pickup Time */}
         <div className="mb-8">
-          <h3 className="text-sm font-semibold text-text-primary mb-4">Pickup Time Today</h3>
-          <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
-            {['09:00 AM', '11:00 AM', '02:00 PM', '04:00 PM'].map(time => (
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-sm font-semibold text-text-primary">Pickup Schedule</h3>
+          </div>
+          
+          <div className="flex gap-2 mb-4 bg-bg-card p-1 rounded-lg border border-border-color">
+            {['Today', 'Tomorrow'].map(date => (
               <button
-                key={time}
-                onClick={() => setActiveTime(time)}
-                className={`min-w-[100px] py-2.5 rounded-full text-xs font-semibold border whitespace-nowrap transition-colors shadow-sm ${
-                  activeTime === time 
-                    ? 'bg-accent-primary border-accent-primary text-white' 
-                    : 'bg-bg-card border-border-color text-text-secondary'
+                key={date}
+                onClick={() => setActiveDate(date as 'Today' | 'Tomorrow')}
+                className={`flex-1 py-2 rounded-md text-xs font-semibold transition-colors ${
+                  activeDate === date 
+                    ? 'bg-bg-elevated text-text-primary shadow-sm' 
+                    : 'text-text-secondary hover:text-text-primary'
                 }`}
               >
-                {time}
+                {date}
               </button>
             ))}
           </div>
+
+          <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+            {timeSlots.map(time => {
+              const isAvailable = isTimeSlotAvailable(time);
+              return (
+                <button
+                  key={time}
+                  onClick={() => isAvailable && setActiveTime(time)}
+                  disabled={!isAvailable}
+                  className={`min-w-[100px] py-2.5 rounded-full text-xs font-semibold border whitespace-nowrap transition-colors shadow-sm ${
+                    !isAvailable
+                      ? 'bg-bg-main border-border-color/50 text-text-muted opacity-50 cursor-not-allowed'
+                      : activeTime === time 
+                        ? 'bg-accent-primary border-accent-primary text-white' 
+                        : 'bg-bg-card border-border-color text-text-secondary hover:border-accent-primary/50'
+                  }`}
+                >
+                  {time}
+                </button>
+              );
+            })}
+          </div>
+          {activeDate === 'Today' && !timeSlots.some(t => isTimeSlotAvailable(t)) && (
+             <p className="text-[11px] text-accent-primary mt-2 flex items-center gap-1">
+               * All time slots for today have passed. Automatically selecting tomorrow.
+             </p>
+          )}
         </div>
 
         {/* Address */}
@@ -261,7 +327,10 @@ export default function BookingScreen({ providerId, onNavigate }: BookingScreenP
           <span className="text-[10px] text-accent-primary">Est. {totalWeight.toFixed(1)} kg</span>
         </div>
         <button 
-          onClick={() => onNavigate('payment')}
+          onClick={() => {
+            if (onBookingComplete) onBookingComplete({ date: activeDate, time: activeTime });
+            onNavigate('payment');
+          }}
           disabled={totalPrice === 0 || activeServices.length === 0}
           className="flex-1 py-4 rounded-xl font-semibold bg-accent-primary text-white active:scale-[0.98] transition-transform shadow-[0_4px_16px_var(--color-accent-glow)] disabled:bg-border-color disabled:text-text-secondary disabled:scale-100 disabled:shadow-none"
         >

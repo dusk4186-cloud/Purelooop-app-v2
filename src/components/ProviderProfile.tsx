@@ -9,12 +9,6 @@ interface ProviderProfileProps {
 
 export default function ProviderProfile({ providerId, onNavigate }: ProviderProfileProps) {
   const provider = providersData.find(p => p.id === providerId) || providersData[0];
-  
-  // Custom monogram logic
-  const getMonogram = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 3);
-  };
-
   return (
     <div className="flex flex-col h-full w-full bg-bg-main">
       <header className="absolute top-0 left-0 w-full p-6 pt-12 flex items-center z-10">
@@ -30,7 +24,7 @@ export default function ProviderProfile({ providerId, onNavigate }: ProviderProf
         {/* Hero Section */}
         <div className="h-[250px] bg-gradient-to-b from-bg-elevated to-bg-main flex items-center justify-center relative">
           <div className="text-7xl font-bold text-accent-primary drop-shadow-[0_10px_20px_var(--color-accent-glow)]">
-            {getMonogram(provider.name)}
+            {provider.image}
           </div>
         </div>
 

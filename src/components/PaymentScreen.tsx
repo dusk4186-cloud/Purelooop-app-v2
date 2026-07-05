@@ -4,7 +4,7 @@ import type { ScreenName } from '../App';
 
 interface PaymentScreenProps {
   onNavigate: (screen: ScreenName) => void;
-  onPaymentSuccess?: () => void;
+  onPaymentSuccess?: (method: string) => void;
 }
 
 export default function PaymentScreen({ onNavigate, onPaymentSuccess }: PaymentScreenProps) {
@@ -101,12 +101,12 @@ export default function PaymentScreen({ onNavigate, onPaymentSuccess }: PaymentS
       <div className="absolute bottom-0 left-0 w-full bg-bg-main border-t border-border-color p-4 pb-12 z-20">
         <button 
           onClick={() => {
-            if (onPaymentSuccess) onPaymentSuccess();
+            if (onPaymentSuccess) onPaymentSuccess(activeMethod);
             onNavigate('tracking');
           }}
           className="w-full py-4 rounded-xl font-semibold bg-accent-primary text-white shadow-[0_4px_16px_var(--color-accent-glow)] active:scale-[0.98] transition-transform"
         >
-          Confirm Payment
+          {activeMethod === 'cash' ? 'Confirm Order' : 'Confirm Payment'}
         </button>
       </div>
     </div>

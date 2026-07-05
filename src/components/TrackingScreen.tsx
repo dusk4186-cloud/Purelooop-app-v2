@@ -6,9 +6,11 @@ import { auth } from '../lib/firebase';
 interface TrackingProps {
   onNavigate: (screen: ScreenName) => void;
   hasActiveOrder?: boolean;
+  activeOrderDetails?: { date: string, time: string } | null;
+  paymentMethod?: string;
 }
 
-export default function TrackingScreen({ onNavigate, hasActiveOrder = false }: TrackingProps) {
+export default function TrackingScreen({ onNavigate, hasActiveOrder = false, activeOrderDetails = null, paymentMethod = 'card' }: TrackingProps) {
   const [showNotificationModal, setShowNotificationModal] = useState(false);
 
   const now = new Date();
@@ -18,13 +20,23 @@ export default function TrackingScreen({ onNavigate, hasActiveOrder = false }: T
   now.setMinutes(now.getMinutes() + 15);
   const time2 = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-  const statuses = [
-    { title: 'Order Placed', desc: `${dateStr}, ${time1}`, active: true, completed: true },
-    { title: 'Driver Assigned', desc: `${dateStr}, ${time2}`, active: true, completed: true },
-    { title: 'Out for Pickup', desc: 'Arriving in 15 mins', active: true, completed: false },
-    { title: 'In Service', desc: 'Pending', active: false, completed: false },
-    { title: 'Delivered', desc: 'Pending', active: false, completed: false },
-  ];
+  const isScheduled = activeOrderDetails?.date === 'Tomorrow';
+
+  const statuses = isScheduled 
+    ? [
+        { title: 'Order Placed', desc: `${dateStr}, ${time1}`, active: true, completed: true },
+        { title: 'Pickup Scheduled', desc: `Tomorrow, ${activeOrderDetails.time}`, active: true, completed: false },
+        { title: 'Driver Assignment', desc: 'Pending', active: false, completed: false },
+        { title: 'In Service', desc: 'Pending', active: false, completed: false },
+        { title: 'Delivered', desc: 'Pending', active: false, completed: false },
+      ]
+    : [
+        { title: 'Order Placed', desc: `${dateStr}, ${time1}`, active: true, completed: true },
+        { title: 'Driver Assigned', desc: `${dateStr}, ${time2}`, active: true, completed: true },
+        { title: 'Out for Pickup', desc: 'Arriving in 15 mins', active: true, completed: false },
+        { title: 'In Service', desc: 'Pending', active: false, completed: false },
+        { title: 'Delivered', desc: 'Pending', active: false, completed: false },
+      ];
 
   return (
     <div className="flex flex-col h-full w-full bg-bg-main relative">
@@ -99,9 +111,13 @@ export default function TrackingScreen({ onNavigate, hasActiveOrder = false }: T
               <div className="w-20 h-20 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center mb-6">
                 <CheckCircle2 className="w-10 h-10" />
               </div>
-              <h2 className="text-2xl font-bold text-text-primary mb-2">Payment Successful!</h2>
+              <h2 className="text-2xl font-bold text-text-primary mb-2">
+                {paymentMethod === 'cash' ? 'Order Confirmed!' : 'Payment Successful!'}
+              </h2>
               <p className="text-sm text-text-secondary max-w-[250px]">
-                Your booking is confirmed. Our driver will be there soon.
+                {isScheduled 
+                  ? `Your booking is confirmed. Pickup is scheduled for tomorrow at ${activeOrderDetails?.time}.` 
+                  : 'Your booking is confirmed. Our driver will be there soon.'}
               </p>
             </div>
 
