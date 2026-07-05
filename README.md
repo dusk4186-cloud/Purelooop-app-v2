@@ -1,38 +1,39 @@
-# Creative UI Template 🚀
+# PureLoop - Modern Laundry Service App
 
-A production-ready React starter template preconfigured for high-end creative interfaces and WebGL design.
+A premium, highly-interactive laundry service prototype built with React, Vite, Tailwind CSS, and Firebase. PureLoop aims to make laundry effortless by connecting users with top-rated local service providers through a seamless, mobile-first web interface.
 
-## Features
+## 🚀 Features
 
-- **React & TypeScript**: Stable modular framework setup.
-- **Tailwind CSS v4**: Built-in support for Tailwind v4 utilizing the Vite compiler plugin (`@tailwindcss/vite`).
-- **Shadcn UI**: Configured with `components.json` using the `radix-nova` style.
-- **React Three Fiber (R3F)**: Render loops and canvas controls ready to go for 3D interactions.
-- **Framer Motion & GSAP**: Animations libraries pre-configured.
-- **Playwright**: Complete E2E testing environment configured and testing scripts added.
+- **Authentication System**: Secure Email/Password and Google Sign-In powered by Firebase Authentication.
+- **Dynamic User Profiles**: Automatic personalized monograms and Google avatar synchronization.
+- **Service Provider Matching**: Browse and filter local laundry partners based on required services (Wash, Iron, Dry Clean).
+- **Time-Aware UI**: Dynamic, contextual greetings based on the user's local time.
+- **Premium Design System**: Fluid animations, glassmorphism elements, dark/light mode toggle, and micro-interactions optimized for mobile displays.
+- **Secure Payment Flow**: Grouped, intuitive payment selection cards with integrated SVG brand assets.
 
----
+## 🛠 Tech Stack
 
-## Getting Started
+- **Frontend**: React 19, Vite, TypeScript
+- **Styling**: Tailwind CSS v4, Lucide React (Icons), Framer Motion (Transitions)
+- **Backend/Auth**: Firebase (Authentication)
+- **Architecture**: Mobile-first PWA approach
 
-### 1. Duplicate to Start a New Project
-Whenever you want to start a new project from this template:
-1. Copy the folder to your new directory name.
-2. Open the directory.
-3. Run `npm install` to link modules.
+## 📦 Getting Started
 
-### 2. Available Scripts
-Inside your project directory:
+To run this project locally:
 
-- **`npm run dev`**: Starts the Vite local development server.
-- **`npm run build`**: Compiles production bundles.
-- **`npm run test:e2e`**: Runs the Playwright E2E test suite in headless mode.
-- **`npm run lint`**: Runs oxlint for incredibly fast TypeScript and TSX analysis.
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set up your Firebase configuration in `src/lib/firebase.ts`.
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
----
-
-## Directory Structure
-- `src/components/ThreeCanvas.tsx`: Ready-to-go Three.js viewer component.
-- `src/App.tsx`: Main layout utilizing grid structures, custom headers, and responsiveness.
-- `src/index.css`: Preconfigured CSS theme containing layout system tokens.
-- `tests/app.spec.ts`: Clean default E2E tests.
+## 📱 Future Roadmap (Case Study)
+- **AI Bill Estimation**: Vision AI to auto-categorize laundry piles and estimate costs before pickup.
+- **Live Fleet Tracking**: Real-time GPS tracking for delivery partners.
+- **Eco-Impact Dashboard**: Tracking water and carbon savings vs traditional home washing.
