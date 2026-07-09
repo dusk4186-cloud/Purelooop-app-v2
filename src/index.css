@@ -7,36 +7,73 @@
 
 @theme {
   --font-sans: 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --color-accent-primary: var(--accent-primary);
-  --color-accent-glow: var(--accent-glow);
-  --color-bg-main: var(--bg-main);
-  --color-bg-card: var(--bg-card);
-  --color-bg-elevated: var(--bg-elevated);
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
-  --color-border-color: var(--border-color);
+  
+  /* Master Typography Scale (1.25 Major Third mapping to 8px grid) */
+  --text-sm: 13px; /* Caption */
+  --text-base: 16px; /* Body */
+  --text-lg: 20px; /* H3 */
+  --text-xl: 24px; /* H2 */
+  --text-2xl: 32px; /* H1 */
+
+  /* Master Color Mapping */
+  --color-bg-primary: var(--theme-bg-primary);
+  --color-bg-alt: var(--theme-bg-alt);
+  --color-bg-card: var(--theme-bg-card);
+  --color-bg-elevated: var(--theme-bg-elevated);
+  
+  --color-text-primary: var(--theme-text-primary);
+  --color-text-secondary: var(--theme-text-secondary);
+  --color-text-muted: var(--theme-text-muted);
+  
+  --color-action-primary: var(--theme-action-primary);
+  --color-action-secondary: var(--theme-action-secondary);
+  --color-accent-glow: var(--theme-accent-glow);
+  --color-border-color: var(--theme-border);
+
+  /* Component Compatibility Aliases */
+  --color-bg-main: var(--theme-bg-primary);
+  --color-accent-primary: var(--theme-action-primary);
 }
 
 @layer base {
   :root {
-    --bg-main: #F8FAFC;
-    --bg-card: #FFFFFF;
-    --bg-elevated: #F1F5F9;
-    --text-primary: #0F172A;
-    --text-secondary: #64748B;
-    --accent-primary: #007367; /* Updated for WCAG AA compliance (4.6:1 contrast) */
-    --accent-glow: rgba(0, 115, 103, 0.2);
-    --border-color: #E2E8F0;
+    /* Master Design Tokens - Light Theme */
+    --theme-bg-primary: #F8FAFC;
+    --theme-bg-alt: #E2E8F0;
+    --theme-bg-card: #FFFFFF;
+    --theme-bg-elevated: #F1F5F9;
+    
+    --theme-text-primary: #0F172A;
+    --theme-text-secondary: #64748B;
+    --theme-text-muted: #94A3B8;
+    
+    --theme-action-primary: #007367; /* WCAG AA */
+    --theme-action-secondary: #0F172A;
+    --theme-accent-glow: rgba(0, 115, 103, 0.2);
+    --theme-border: #E2E8F0;
   }
+  
   .dark {
-    --bg-main: #060E17;
-    --bg-card: #0A1624;
-    --bg-elevated: #122236;
-    --text-primary: #F8FAFC;
-    --text-secondary: #94A3B8;
-    --accent-primary: #00E7D2;
-    --accent-glow: rgba(0, 231, 210, 0.2);
-    --border-color: #1E293B;
+    /* Master Design Tokens - Dark Theme */
+    --theme-bg-primary: #060e17;
+    --theme-bg-alt: #0b1824;
+    --theme-bg-card: #0A1624;
+    --theme-bg-elevated: #122236;
+    
+    --theme-text-primary: #e0eaf0;
+    --theme-text-secondary: #8fa8bc;
+    --theme-text-muted: #5a7a8e;
+    
+    --theme-action-primary: #00E7D2;
+    --theme-action-secondary: #4D78D3;
+    --theme-accent-glow: rgba(0, 231, 210, 0.2);
+    --theme-border: #1E293B;
+  }
+  
+  /* Focus Accessibility */
+  *:focus-visible {
+    outline: 2px solid var(--theme-action-primary);
+    outline-offset: 2px;
   }
 }
 

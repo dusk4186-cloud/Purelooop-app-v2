@@ -7,9 +7,10 @@ interface BookingScreenProps {
   providerId: string | null;
   onNavigate: (screen: ScreenName) => void;
   onBookingComplete?: (details: {date: string, time: string}) => void;
+  userAddress?: string;
 }
 
-export default function BookingScreen({ providerId, onNavigate, onBookingComplete }: BookingScreenProps) {
+export default function BookingScreen({ providerId, onNavigate, onBookingComplete, userAddress = "42 Laundry St, Block B, 2nd Floor" }: BookingScreenProps) {
   const provider = providersData.find(p => p.id === providerId) || providersData[0];
   
   const [activeServices, setActiveServices] = useState<string[]>(['Wash']);
@@ -309,7 +310,7 @@ export default function BookingScreen({ providerId, onNavigate, onBookingComplet
             <div>
               <h4 className="text-sm font-medium text-text-primary mb-1">Home</h4>
               <p className="text-xs text-text-secondary leading-relaxed pr-8">
-                {provider.address}
+                {userAddress}
               </p>
             </div>
             <button className="absolute top-4 right-4 text-accent-primary text-xs font-medium flex items-center gap-1">

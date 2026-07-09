@@ -13,6 +13,9 @@ import BookingScreen from './components/BookingScreen';
 import PaymentScreen from './components/PaymentScreen';
 import TrackingScreen from './components/TrackingScreen';
 import ProfileScreen from './components/ProfileScreen';
+import EditProfileScreen from './components/EditProfileScreen';
+import AddressesScreen from './components/AddressesScreen';
+import NotificationScreen from './components/NotificationScreen';
 import { ArrowLeft } from 'lucide-react';
 
 interface SettingsProps {
@@ -66,6 +69,7 @@ export default function App() {
   const [hasActiveOrder, setHasActiveOrder] = useState(false);
   const [activeOrderDetails, setActiveOrderDetails] = useState<{date: string, time: string} | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string>('card');
+  const [userAddress, setUserAddress] = useState<string>('B-402, Royal Residency, MG Road, Bangalore, 560001');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -109,7 +113,7 @@ export default function App() {
       case 'login':
       case 'signup':
       case 'check-email':
-        return <AuthScreens currentScreen={currentScreen} onNavigate={setCurrentScreen} />;
+        return <AuthScreens currentScreen={currentScreen} onNavigate={setCurrentScreen} onSignupAddress={setUserAddress} />;
       case 'home':
         return <HomeScreen onNavigate={setCurrentScreen} onSelectProvider={setSelectedProvider} />;
       case 'profile':
@@ -117,19 +121,19 @@ export default function App() {
       case 'provider':
         return <ProviderProfile providerId={selectedProvider} onNavigate={setCurrentScreen} />;
       case 'booking':
-        return <BookingScreen providerId={selectedProvider} onNavigate={setCurrentScreen} onBookingComplete={setActiveOrderDetails} />;
+        return <BookingScreen providerId={selectedProvider} onNavigate={setCurrentScreen} onBookingComplete={setActiveOrderDetails} userAddress={userAddress} />;
       case 'payment':
         return <PaymentScreen onNavigate={setCurrentScreen} onPaymentSuccess={(method) => { setHasActiveOrder(true); setPaymentMethod(method); }} />;
       case 'tracking':
         return <TrackingScreen onNavigate={setCurrentScreen} hasActiveOrder={hasActiveOrder} activeOrderDetails={activeOrderDetails} paymentMethod={paymentMethod} />;
       case 'edit-profile':
-        return <GenericSettingsScreen title="Edit Profile" onNavigate={setCurrentScreen} />;
+        return <EditProfileScreen onNavigate={setCurrentScreen} />;
       case 'addresses':
-        return <GenericSettingsScreen title="Saved Addresses" onNavigate={setCurrentScreen} />;
+        return <AddressesScreen onNavigate={setCurrentScreen} userAddress={userAddress} setUserAddress={setUserAddress} />;
       case 'payments':
         return <GenericSettingsScreen title="Payment Methods" onNavigate={setCurrentScreen} />;
       case 'settings':
-        return <GenericSettingsScreen title="Notification Toggles" onNavigate={setCurrentScreen} />;
+        return <NotificationScreen onNavigate={setCurrentScreen} />;
       case 'help':
         return <GenericSettingsScreen title="Help & Support" onNavigate={setCurrentScreen} />;
       case 'privacy':

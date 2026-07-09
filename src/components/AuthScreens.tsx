@@ -7,15 +7,17 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfi
 interface AuthProps {
   currentScreen: ScreenName;
   onNavigate: (screen: ScreenName) => void;
+  onSignupAddress?: (address: string) => void;
 }
 
-export default function AuthScreens({ currentScreen, onNavigate }: AuthProps) {
+export default function AuthScreens({ currentScreen, onNavigate, onSignupAddress }: AuthProps) {
   const [authMethod, setAuthMethod] = useState<'email' | 'phone'>('phone');
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   
   const [otpSent, setOtpSent] = useState(false);
@@ -67,11 +69,15 @@ export default function AuthScreens({ currentScreen, onNavigate }: AuthProps) {
   };
 
   const handleSignup = async () => {
-    if (!isEmailValid || !password || !name || !isPhoneValid) return;
+    if (!isEmailValid || !password || !name || !isPhoneValid || !address) return;
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName: name });
       
+      if (onSignupAddress) {
+        onSignupAddress(address);
+      }
+
       setSandboxToast("Account created successfully!");
       setTimeout(() => {
         setSandboxToast('');
@@ -85,7 +91,7 @@ export default function AuthScreens({ currentScreen, onNavigate }: AuthProps) {
   const isPasswordStrong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{9,}$/.test(password);
   
   const isLoginValid = authMethod === 'email' ? (isEmailValid && password) : (isPhoneValid && (!otpSent || otp.length === 6));
-  const isSignupValid = isEmailValid && isPasswordStrong && name && isPhoneValid;
+  const isSignupValid = isEmailValid && isPasswordStrong && name && isPhoneValid && address.length > 5;
 
   return (
     <div className="flex flex-col h-full w-full bg-bg-main relative">
@@ -248,6 +254,15 @@ export default function AuthScreens({ currentScreen, onNavigate }: AuthProps) {
                   className="flex-1 bg-bg-elevated border border-border-color rounded-r-xl p-4 text-sm text-text-primary outline-none focus:border-accent-primary"
                 />
               </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-xs text-text-secondary">Pickup Address</label>
+              <textarea 
+                value={address}
+                onChange={e => setAddress(e.target.value)}
+                placeholder="House No, Street, Landmark, City" 
+                className="bg-bg-elevated border border-border-color rounded-xl p-4 text-sm text-text-primary outline-none focus:border-accent-primary min-h-[80px] resize-none"
+              />
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-xs text-text-secondary">Email</label>
