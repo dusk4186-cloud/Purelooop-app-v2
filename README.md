@@ -1,39 +1,66 @@
-# PureLoop - Modern Laundry Service App
+# 💧 PureLoop — React Application
 
-A premium, highly-interactive laundry service prototype built with React, Vite, Tailwind CSS, and Firebase. PureLoop aims to make laundry effortless by connecting users with top-rated local service providers through a seamless, mobile-first web interface.
+<div align="center">
+  <p><strong>Refresh. Rinse. Repeat.</strong></p>
+  <p>A modern, high-fidelity laundry booking application built with React, Vite, and Tailwind CSS.</p>
 
-## 🚀 Features
+  <a href="https://purelooop-app-v2.vercel.app/" target="_blank">View Live App</a>
+  <span> | </span>
+  <a href="https://pureloop-case-study.vercel.app/" target="_blank">View UX Case Study</a>
+</div>
 
-- **Authentication System**: Secure Email/Password and Google Sign-In powered by Firebase Authentication.
-- **Dynamic User Profiles**: Automatic personalized monograms and Google avatar synchronization.
-- **Service Provider Matching**: Browse and filter local laundry partners based on required services (Wash, Iron, Dry Clean).
-- **Time-Aware UI**: Dynamic, contextual greetings based on the user's local time.
-- **Premium Design System**: Fluid animations, glassmorphism elements, dark/light mode toggle, and micro-interactions optimized for mobile displays.
-- **Secure Payment Flow**: Grouped, intuitive payment selection cards with integrated SVG brand assets.
+---
+
+## ✨ Features
+
+- **Strict 8px Grid System**: The entire UI is built on a mathematical 1.25 Major Third typography scale and an unyielding 8px spatial grid for perfect vertical rhythm.
+- **Firebase Authentication**: Full user authentication flow including Sign Up, Login, and secure session management.
+- **Dynamic State Management**: Centralized React state handling global user details, addresses, and active orders.
+- **Interactive Micro-Animations**: Smooth physics-based hover states and transitions to ensure a premium, app-like feel.
+- **Accessible Design**: Built following strict WCAG AA contrast ratios with semantic HTML and comprehensive `:focus-visible` states.
 
 ## 🛠 Tech Stack
 
-- **Frontend**: React 19, Vite, TypeScript
-- **Styling**: Tailwind CSS v4, Lucide React (Icons), Framer Motion (Transitions)
-- **Backend/Auth**: Firebase (Authentication)
-- **Architecture**: Mobile-first PWA approach
+- **Frontend Core**: React 18 (TypeScript), Vite
+- **Styling**: Tailwind CSS, PostCSS, Lucide React (Icons)
+- **Backend & Auth**: Firebase Authentication & Firestore
+- **Routing**: React Router DOM (v6)
 
-## 📦 Getting Started
+## 🚀 Getting Started
 
-To run this project locally:
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd laundry-app-prototype
+   ```
 
-1. Clone the repository
-2. Install dependencies:
+2. **Install Dependencies**:
    ```bash
    npm install
    ```
-3. Set up your Firebase configuration in `src/lib/firebase.ts`.
-4. Start the development server:
+
+3. **Configure Environment**:
+   Create a `.env` file in the root directory and add your Firebase configuration:
+   ```env
+   VITE_FIREBASE_API_KEY="your_api_key"
+   VITE_FIREBASE_AUTH_DOMAIN="your_auth_domain"
+   VITE_FIREBASE_PROJECT_ID="your_project_id"
+   VITE_FIREBASE_STORAGE_BUCKET="your_storage_bucket"
+   VITE_FIREBASE_MESSAGING_SENDER_ID="your_messaging_sender_id"
+   VITE_FIREBASE_APP_ID="your_app_id"
+   ```
+
+4. **Run the Development Server**:
    ```bash
    npm run dev
    ```
 
-## 📱 Future Roadmap (Case Study)
-- **AI Bill Estimation**: Vision AI to auto-categorize laundry piles and estimate costs before pickup.
-- **Live Fleet Tracking**: Real-time GPS tracking for delivery partners.
-- **Eco-Impact Dashboard**: Tracking water and carbon savings vs traditional home washing.
+## 📐 Design System
+
+This app utilizes a robust, CSS-variable driven design system. All Master Tokens are located in `src/index.css`.
+- **Primary Action**: `#007367` (Ensures 4.5:1 Contrast Ratio)
+- **Backgrounds**: `slate-50` (`#F8FAFC`) to pure white cards.
+- **Typography Base**: `Inter`, 16px baseline.
+
+---
+*Built as the Version 2 technical execution of the PureLoop UX concept.*
