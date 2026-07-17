@@ -69,7 +69,8 @@ export default function App() {
   const [hasActiveOrder, setHasActiveOrder] = useState(false);
   const [activeOrderDetails, setActiveOrderDetails] = useState<{date: string, time: string} | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string>('card');
-  const [userAddress, setUserAddress] = useState<string>('B-402, Royal Residency, MG Road, Bangalore, 560001');
+  const [userAddress, setUserAddress] = useState<string>('B-402, Royal Residency, MG Road, Bengaluru, 560001');
+  const [userCity, setUserCity] = useState<string>('Bengaluru');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -78,8 +79,6 @@ export default function App() {
       if (user) {
         if (currentScreen === 'splash') {
           setTimeout(() => setCurrentScreen('home'), 1500);
-        } else if (['login', 'signup', 'check-email'].includes(currentScreen)) {
-          setCurrentScreen('home');
         }
       } else {
         if (currentScreen === 'splash') {
@@ -109,17 +108,17 @@ export default function App() {
       case 'splash':
         return <SplashScreen />;
       case 'onboarding':
-        return <OnboardingScreen onNavigate={setCurrentScreen} />;
+        return <OnboardingScreen onNavigate={setCurrentScreen} setUserCity={setUserCity} />;
       case 'login':
       case 'signup':
       case 'check-email':
-        return <AuthScreens currentScreen={currentScreen} onNavigate={setCurrentScreen} onSignupAddress={setUserAddress} />;
+        return <AuthScreens currentScreen={currentScreen} onNavigate={setCurrentScreen} onSignupAddress={setUserAddress} onSignupCity={setUserCity} />;
       case 'home':
-        return <HomeScreen onNavigate={setCurrentScreen} onSelectProvider={setSelectedProvider} />;
+        return <HomeScreen onNavigate={setCurrentScreen} onSelectProvider={setSelectedProvider} userCity={userCity} />;
       case 'profile':
         return <ProfileScreen onNavigate={setCurrentScreen} />;
       case 'provider':
-        return <ProviderProfile providerId={selectedProvider} onNavigate={setCurrentScreen} />;
+        return <ProviderProfile providerId={selectedProvider} onNavigate={setCurrentScreen} isGuest={!session} />;
       case 'booking':
         return <BookingScreen providerId={selectedProvider} onNavigate={setCurrentScreen} onBookingComplete={setActiveOrderDetails} userAddress={userAddress} />;
       case 'payment':
@@ -129,7 +128,7 @@ export default function App() {
       case 'edit-profile':
         return <EditProfileScreen onNavigate={setCurrentScreen} />;
       case 'addresses':
-        return <AddressesScreen onNavigate={setCurrentScreen} userAddress={userAddress} setUserAddress={setUserAddress} />;
+        return <AddressesScreen onNavigate={setCurrentScreen} userAddress={userAddress} setUserAddress={setUserAddress} userCity={userCity} setUserCity={setUserCity} />;
       case 'payments':
         return <GenericSettingsScreen title="Payment Methods" onNavigate={setCurrentScreen} />;
       case 'settings':

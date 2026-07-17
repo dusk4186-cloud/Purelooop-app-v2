@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Eye, EyeOff, Smartphone, Mail } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Smartphone, Mail, Home, Briefcase, Building } from 'lucide-react';
 import type { ScreenName } from '../App';
 import { auth } from '../lib/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
@@ -8,18 +8,32 @@ interface AuthProps {
   currentScreen: ScreenName;
   onNavigate: (screen: ScreenName) => void;
   onSignupAddress?: (address: string) => void;
+  onSignupCity?: (city: string) => void;
 }
 
-export default function AuthScreens({ currentScreen, onNavigate, onSignupAddress }: AuthProps) {
+const CITIES = [
+  'Bengaluru', 'Hyderabad', 'Noida'
+];
+
+export default function AuthScreens({ currentScreen, onNavigate, onSignupAddress, onSignupCity }: AuthProps) {
   const [authMethod, setAuthMethod] = useState<'email' | 'phone'>('phone');
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   
+  // Signup Step 2 State
+  const [signupStep, setSignupStep] = useState<1 | 2>(1);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [city, setCity] = useState('');
+  const [pincode, setPincode] = useState('');
+  const [house, setHouse] = useState('');
+  const [street, setStreet] = useState('');
+  const [landmark, setLandmark] = useState('');
+  const [activeLabel, setActiveLabel] = useState<'Home' | 'Work' | 'Hostel' | 'PG'>('Home');
+
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
   const [sandboxToast, setSandboxToast] = useState('');
@@ -31,7 +45,10 @@ export default function AuthScreens({ currentScreen, onNavigate, onSignupAddress
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-      onNavigate('home');
+      if (currentScreen === 'login') {
+        onNavigate('signup');
+      }
+      setTimeout(() => setSignupStep(2), 50);
     } catch (error: any) {
       console.error(error);
       if (error.code !== 'auth/popup-closed-by-user') {
@@ -69,13 +86,22 @@ export default function AuthScreens({ currentScreen, onNavigate, onSignupAddress
   };
 
   const handleSignup = async () => {
-    if (!isEmailValid || !password || !name || !isPhoneValid || !address) return;
+    if (!city || !pincode || !house || !street || !isValidPincode(city, pincode)) return;
+
+    const formattedAddress = `${house}, ${street}${landmark ? `, Near ${landmark}` : ''}, ${city} - ${pincode}`;
+
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(userCredential.user, { displayName: name });
+      if (email && password) {
+        // Normal Email Signup
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCredential.user, { displayName: name });
+      }
       
       if (onSignupAddress) {
-        onSignupAddress(address);
+        onSignupAddress(formattedAddress);
+      }
+      if (onSignupCity) {
+        onSignupCity(city);
       }
 
       setSandboxToast("Account created successfully!");
@@ -89,9 +115,20 @@ export default function AuthScreens({ currentScreen, onNavigate, onSignupAddress
   };
 
   const isPasswordStrong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{9,}$/.test(password);
+
+  const isValidPincode = (city: string, pin: string) => {
+    if (pin.length !== 6) return false;
+    if (city === 'Bengaluru' && !pin.startsWith('560')) return false;
+    if (city === 'Noida' && !pin.startsWith('201')) return false;
+    if (city === 'Hyderabad' && !(pin.startsWith('500') || pin.startsWith('501'))) return false;
+    return true;
+  };
   
+  const pinValid = pincode.length === 0 || isValidPincode(city, pincode);
+
   const isLoginValid = authMethod === 'email' ? (isEmailValid && password) : (isPhoneValid && (!otpSent || otp.length === 6));
-  const isSignupValid = isEmailValid && isPasswordStrong && name && isPhoneValid && address.length > 5;
+  const isSignupStep1Valid = isEmailValid && isPasswordStrong && name && isPhoneValid && termsAccepted;
+  const isSignupStep2Valid = city && pincode.length === 6 && house && street && isValidPincode(city, pincode);
 
   return (
     <div className="flex flex-col h-full w-full bg-bg-main relative">
@@ -102,11 +139,20 @@ export default function AuthScreens({ currentScreen, onNavigate, onSignupAddress
       )}
       
       <header className="p-6 pt-12 flex justify-between items-center bg-bg-main">
-        <button onClick={() => onNavigate('onboarding')} className="text-text-primary p-2 -ml-2">
+        <button onClick={() => {
+          if (currentScreen === 'signup' && signupStep === 2) {
+            setSignupStep(1);
+          } else {
+            onNavigate('onboarding');
+          }
+        }} className="text-text-primary p-2 -ml-2">
           <ArrowLeft className="w-6 h-6" />
         </button>
-        <h3 className="text-lg font-semibold text-text-primary">
+        <h3 className="text-lg font-semibold text-text-primary flex flex-col items-center">
           {currentScreen === 'login' ? 'Log In' : 'Sign Up'}
+          {currentScreen === 'signup' && (
+            <span className="text-[10px] text-text-secondary mt-1">Steps: {signupStep}/2</span>
+          )}
         </h3>
         <div className="w-10" />
       </header>
@@ -182,14 +228,39 @@ export default function AuthScreens({ currentScreen, onNavigate, onSignupAddress
                 </div>
                 {otpSent && (
                   <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-top-2 mt-2">
-                    <label className="text-xs text-text-secondary">Enter OTP</label>
-                    <input 
-                      type="text" 
-                      value={otp}
-                      onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      placeholder="123456" 
-                      className="w-full bg-bg-elevated border border-border-color rounded-xl p-4 text-sm text-text-primary outline-none focus:border-accent-primary tracking-widest font-semibold"
-                    />
+                    <label className="text-xs text-text-secondary">Enter 6-digit OTP</label>
+                    <div className="flex justify-between gap-2">
+                      {[...Array(6)].map((_, i) => (
+                        <input 
+                          key={i}
+                          id={`otp-${i}`}
+                          type="text"
+                          maxLength={1}
+                          value={otp[i] || ''}
+                          onChange={e => {
+                            const val = e.target.value.replace(/\D/g, '');
+                            if (val) {
+                              const newOtp = otp.split('');
+                              newOtp[i] = val;
+                              setOtp(newOtp.join(''));
+                              if (i < 5) document.getElementById(`otp-${i+1}`)?.focus();
+                            }
+                          }}
+                          onKeyDown={e => {
+                            if (e.key === 'Backspace') {
+                              if (!otp[i] && i > 0) {
+                                document.getElementById(`otp-${i-1}`)?.focus();
+                              } else {
+                                const newOtp = otp.split('');
+                                newOtp[i] = '';
+                                setOtp(newOtp.join(''));
+                              }
+                            }
+                          }}
+                          className="w-11 h-12 sm:w-12 sm:h-14 text-center bg-bg-elevated border border-border-color rounded-xl text-lg text-text-primary outline-none focus:border-accent-primary font-bold transition-colors"
+                        />
+                      ))}
+                    </div>
                   </div>
                 )}
               </>
@@ -228,8 +299,8 @@ export default function AuthScreens({ currentScreen, onNavigate, onSignupAddress
           </div>
         )}
 
-        {currentScreen === 'signup' && (
-          <div className="flex flex-col gap-4 py-6">
+        {currentScreen === 'signup' && signupStep === 1 && (
+          <div className="flex flex-col gap-4 py-6 animate-in fade-in slide-in-from-left-4">
             <div className="flex flex-col gap-2">
               <label className="text-xs text-text-secondary">Full Name</label>
               <input 
@@ -254,15 +325,6 @@ export default function AuthScreens({ currentScreen, onNavigate, onSignupAddress
                   className="flex-1 bg-bg-elevated border border-border-color rounded-r-xl p-4 text-sm text-text-primary outline-none focus:border-accent-primary"
                 />
               </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-xs text-text-secondary">Pickup Address</label>
-              <textarea 
-                value={address}
-                onChange={e => setAddress(e.target.value)}
-                placeholder="House No, Street, Landmark, City" 
-                className="bg-bg-elevated border border-border-color rounded-xl p-4 text-sm text-text-primary outline-none focus:border-accent-primary min-h-[80px] resize-none"
-              />
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-xs text-text-secondary">Email</label>
@@ -296,12 +358,25 @@ export default function AuthScreens({ currentScreen, onNavigate, onSignupAddress
               )}
             </div>
             
+            <div className="flex items-center gap-3 mt-2">
+              <input 
+                type="checkbox" 
+                id="tnc"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                className="w-5 h-5 rounded-md border-border-color text-action-primary focus:ring-action-primary bg-bg-elevated accent-action-primary"
+              />
+              <label htmlFor="tnc" className="text-xs text-text-secondary leading-tight cursor-pointer">
+                I agree to the <span className="text-accent-primary">Terms and Conditions</span> and Privacy Policy.
+              </label>
+            </div>
+
             <button 
-              onClick={handleSignup}
-              disabled={!isSignupValid}
-              className="mt-4 w-full py-4 rounded-xl font-semibold bg-accent-primary text-white disabled:bg-border-color disabled:text-text-secondary transition-all shadow-[0_4px_16px_var(--color-accent-glow)] disabled:shadow-none"
+              onClick={() => setSignupStep(2)}
+              disabled={!isSignupStep1Valid}
+              className="mt-4 w-full py-4 rounded-xl font-semibold bg-accent-primary text-white disabled:bg-border-color disabled:text-text-secondary transition-all shadow-[0_4px_16px_var(--color-accent-glow)] disabled:shadow-none flex items-center justify-center gap-2"
             >
-              Create Account
+              Enter Address ➔
             </button>
 
             <div className="relative flex items-center gap-4 my-2">
@@ -326,6 +401,106 @@ export default function AuthScreens({ currentScreen, onNavigate, onSignupAddress
             <p className="text-center text-sm text-text-secondary mt-2">
               Already have an account? <span onClick={() => onNavigate('login')} className="text-accent-primary font-semibold cursor-pointer">Log In</span>
             </p>
+          </div>
+        )}
+
+        {currentScreen === 'signup' && signupStep === 2 && (
+          <div className="flex flex-col gap-4 py-6 animate-in fade-in slide-in-from-right-4">
+            <h4 className="text-sm font-semibold text-text-primary mb-2">Set Pickup Location</h4>
+            
+            <div className="space-y-6 mb-8">
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1">City *</label>
+                <select 
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="w-full p-3 rounded-xl bg-bg-elevated border border-border-color text-sm text-text-primary focus:border-action-primary focus:ring-1 focus:ring-action-primary outline-none transition-colors appearance-none"
+                >
+                  <option value="" disabled>Select City</option>
+                  {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  <option disabled>---</option>
+                  <option disabled>We're working to expand to your area. Check back soon!</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1">Pincode *</label>
+                <input 
+                  type="text" 
+                  maxLength={6}
+                  value={pincode}
+                  onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
+                  className={`w-full p-3 rounded-xl bg-bg-elevated border text-sm text-text-primary focus:ring-1 outline-none ${!pinValid ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-border-color focus:border-action-primary focus:ring-action-primary'}`}
+                  placeholder="e.g. 560001"
+                />
+                {!pinValid && (
+                  <p className="text-[10px] text-red-500 mt-1">Invalid pincode for {city}.</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1">House/Flat No. & Building *</label>
+                <input 
+                  type="text" 
+                  value={house}
+                  onChange={(e) => setHouse(e.target.value)}
+                  className="w-full p-3 rounded-xl bg-bg-elevated border border-border-color text-sm text-text-primary focus:border-action-primary focus:ring-1 outline-none"
+                  placeholder="e.g. Flat 402, Royal Residency"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1">Street / Area / Locality *</label>
+                <input 
+                  type="text" 
+                  value={street}
+                  onChange={(e) => setStreet(e.target.value)}
+                  className="w-full p-3 rounded-xl bg-bg-elevated border border-border-color text-sm text-text-primary focus:border-action-primary focus:ring-1 outline-none"
+                  placeholder="e.g. MG Road, Indiranagar"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1">Landmark (Optional)</label>
+                <input 
+                  type="text" 
+                  value={landmark}
+                  onChange={(e) => setLandmark(e.target.value)}
+                  className="w-full p-3 rounded-xl bg-bg-elevated border border-border-color text-sm text-text-primary focus:border-action-primary focus:ring-1 outline-none"
+                  placeholder="e.g. Opposite Metro Station"
+                />
+              </div>
+            </div>
+
+            <label className="block text-xs font-medium text-text-secondary mb-3 mt-4">Save As</label>
+            <div className="flex flex-wrap gap-3 mb-8">
+              {['Home', 'Work', 'Hostel', 'PG'].map(label => {
+                const isSelected = activeLabel === label;
+                const Icon = label === 'Home' ? Home : label === 'Work' ? Briefcase : Building;
+                return (
+                  <button
+                    key={label}
+                    onClick={() => setActiveLabel(label as any)}
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border transition-all ${
+                      isSelected 
+                        ? 'bg-action-primary/10 border-action-primary text-action-primary' 
+                        : 'bg-bg-elevated border-border-color text-text-secondary hover:border-action-primary/50'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {label}
+                  </button>
+                )
+              })}
+            </div>
+
+            <button 
+              onClick={handleSignup}
+              disabled={!isSignupStep2Valid}
+              className="w-full py-4 rounded-xl font-semibold bg-accent-primary text-white disabled:bg-border-color disabled:text-text-secondary transition-all shadow-[0_4px_16px_var(--color-accent-glow)] disabled:shadow-none"
+            >
+              Create Account
+            </button>
           </div>
         )}
       </div>

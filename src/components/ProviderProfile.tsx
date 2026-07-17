@@ -5,9 +5,10 @@ import { providersData } from '../lib/mockData';
 interface ProviderProfileProps {
   providerId: string | null;
   onNavigate: (screen: ScreenName) => void;
+  isGuest?: boolean;
 }
 
-export default function ProviderProfile({ providerId, onNavigate }: ProviderProfileProps) {
+export default function ProviderProfile({ providerId, onNavigate, isGuest }: ProviderProfileProps) {
   const provider = providersData.find(p => p.id === providerId) || providersData[0];
   return (
     <div className="flex flex-col h-full w-full bg-bg-main">
@@ -70,7 +71,13 @@ export default function ProviderProfile({ providerId, onNavigate }: ProviderProf
 
       <div className="absolute bottom-0 left-0 w-full bg-bg-main border-t border-border-color p-4 pb-12 z-20">
         <button 
-          onClick={() => onNavigate('booking')}
+          onClick={() => {
+            if (isGuest) {
+              onNavigate('signup');
+            } else {
+              onNavigate('booking');
+            }
+          }}
           className="w-full py-4 rounded-xl font-semibold bg-accent-primary text-white shadow-[0_4px_16px_var(--color-accent-glow)] active:scale-[0.98] transition-transform"
         >
           Book Now

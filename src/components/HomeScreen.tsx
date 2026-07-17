@@ -7,9 +7,10 @@ import { auth } from '../lib/firebase';
 interface HomeProps {
   onNavigate: (screen: ScreenName) => void;
   onSelectProvider: (id: string) => void;
+  userCity?: string;
 }
 
-export default function HomeScreen({ onNavigate, onSelectProvider }: HomeProps) {
+export default function HomeScreen({ onNavigate, onSelectProvider, userCity }: HomeProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeService, setActiveService] = useState<string | null>(null);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
@@ -30,7 +31,8 @@ export default function HomeScreen({ onNavigate, onSelectProvider }: HomeProps) 
   const filteredProviders = providersData.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesService = activeService ? p.services.includes(activeService) : true;
-    return matchesSearch && matchesService;
+    const matchesCity = userCity ? p.address.toLowerCase().includes(userCity.toLowerCase()) : true;
+    return matchesSearch && matchesService && matchesCity;
   });
 
   return (
@@ -130,8 +132,12 @@ export default function HomeScreen({ onNavigate, onSelectProvider }: HomeProps) 
         </div>
         <div className="flex flex-col gap-4">
           {filteredProviders.length === 0 ? (
-            <div className="text-center py-8 text-text-secondary text-sm">
-              No providers found.
+            <div className="text-center py-10 bg-bg-elevated rounded-2xl border border-border-color">
+              <div className="text-4xl mb-3">📍</div>
+              <h4 className="text-text-primary font-bold mb-1">No providers found</h4>
+              <p className="text-text-secondary text-sm">
+                We're not active in {userCity ? <span className="text-accent-primary font-semibold">{userCity}</span> : 'this area'} yet.
+              </p>
             </div>
           ) : (
             filteredProviders.map(provider => (
@@ -141,23 +147,28 @@ export default function HomeScreen({ onNavigate, onSelectProvider }: HomeProps) 
                   onSelectProvider(provider.id);
                   onNavigate('provider');
                 }}
-                className="bg-bg-card border border-border-color rounded-2xl p-4 flex gap-4 items-center cursor-pointer active:scale-[0.98] transition-transform shadow-sm"
+                className="bg-bg-card border border-border-color rounded-3xl p-5 flex gap-5 items-start cursor-pointer active:scale-[0.98] transition-transform shadow-sm hover:border-action-primary/30"
               >
-                <div className="w-[70px] h-[70px] rounded-xl bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center text-2xl text-accent-primary font-bold">
+                <div className="w-[75px] h-[75px] shrink-0 rounded-2xl bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center text-2xl text-accent-primary font-bold shadow-inner">
                   {provider.image}
                 </div>
-                <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-text-primary mb-1">{provider.name}</h4>
-                  <p className="text-xs text-text-secondary mb-2">{provider.address}</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-semibold text-amber-400 flex items-center gap-1">
+                <div className="flex-1 min-w-0 pb-1">
+                  <h4 className="text-[15px] font-bold text-text-primary mb-1.5 leading-tight">{provider.name}</h4>
+                  <p className="text-[13px] text-text-secondary mb-3 leading-snug line-clamp-3">{provider.address}</p>
+                  <div className="flex justify-between items-end">
+                    <span className="text-[13px] font-bold text-amber-500 flex items-center gap-1.5">
                       ⭐ {provider.rating}
                     </span>
-                    <span className="text-sm font-bold text-accent-primary">₹{provider.pricePerKg}/kg</span>
+                    <span className="text-[15px] font-extrabold text-accent-primary leading-none">₹{provider.pricePerKg}/kg</span>
                   </div>
                 </div>
               </div>
             ))
+          )}
+          {filteredProviders.length === 1 && (
+            <div className="text-center py-4 text-xs font-medium text-text-secondary mt-2 opacity-80">
+              More trusted laundry partners are coming soon.
+            </div>
           )}
         </div>
       </div>
