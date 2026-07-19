@@ -17,6 +17,7 @@ import EditProfileScreen from './components/EditProfileScreen';
 import AddressesScreen from './components/AddressesScreen';
 import NotificationScreen from './components/NotificationScreen';
 import { ArrowLeft } from 'lucide-react';
+import { INITIAL_ITEMS } from './lib/constants';
 
 interface SettingsProps {
   title: string;
@@ -72,6 +73,12 @@ export default function App() {
   const [userAddress, setUserAddress] = useState<string>('B-402, Royal Residency, MG Road, Bengaluru, 560001');
   const [userCity, setUserCity] = useState<string>('Bengaluru');
 
+  // Lifted Cart State
+  const [cartItems, setCartItems] = useState(INITIAL_ITEMS);
+  const [activeServices, setActiveServices] = useState<string[]>(['Wash']);
+  const [customItems, setCustomItems] = useState<{name: string, qty: number}[]>([]);
+  const [bookingTotal, setBookingTotal] = useState(0);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setSession(user);
@@ -120,9 +127,25 @@ export default function App() {
       case 'provider':
         return <ProviderProfile providerId={selectedProvider} onNavigate={setCurrentScreen} isGuest={!session} />;
       case 'booking':
-        return <BookingScreen providerId={selectedProvider} onNavigate={setCurrentScreen} onBookingComplete={setActiveOrderDetails} userAddress={userAddress} />;
+        return <BookingScreen 
+                  providerId={selectedProvider} 
+                  onNavigate={setCurrentScreen} 
+                  onBookingComplete={setActiveOrderDetails} 
+                  userAddress={userAddress} 
+                  cartItems={cartItems}
+                  setCartItems={setCartItems}
+                  activeServices={activeServices}
+                  setActiveServices={setActiveServices}
+                  customItems={customItems}
+                  setCustomItems={setCustomItems}
+                  setBookingTotal={setBookingTotal}
+               />;
       case 'payment':
-        return <PaymentScreen onNavigate={setCurrentScreen} onPaymentSuccess={(method) => { setHasActiveOrder(true); setPaymentMethod(method); }} />;
+        return <PaymentScreen 
+                  onNavigate={setCurrentScreen} 
+                  bookingTotal={bookingTotal}
+                  onPaymentSuccess={(method) => { setHasActiveOrder(true); setPaymentMethod(method); }} 
+               />;
       case 'tracking':
         return <TrackingScreen onNavigate={setCurrentScreen} hasActiveOrder={hasActiveOrder} activeOrderDetails={activeOrderDetails} paymentMethod={paymentMethod} />;
       case 'edit-profile':

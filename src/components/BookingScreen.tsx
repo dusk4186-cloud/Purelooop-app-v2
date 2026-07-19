@@ -8,76 +8,30 @@ interface BookingScreenProps {
   onNavigate: (screen: ScreenName) => void;
   onBookingComplete?: (details: {date: string, time: string}) => void;
   userAddress?: string;
+  cartItems: any;
+  setCartItems: any;
+  activeServices: string[];
+  setActiveServices: any;
+  customItems: {name: string, qty: number}[];
+  setCustomItems: any;
+  setBookingTotal: any;
 }
 
-export default function BookingScreen({ providerId, onNavigate, onBookingComplete, userAddress = "42 Laundry St, Block B, 2nd Floor" }: BookingScreenProps) {
+export default function BookingScreen({ 
+  providerId, 
+  onNavigate, 
+  onBookingComplete, 
+  userAddress = "42 Laundry St, Block B, 2nd Floor",
+  cartItems: items,
+  setCartItems: setItems,
+  activeServices,
+  setActiveServices,
+  customItems,
+  setCustomItems,
+  setBookingTotal
+}: BookingScreenProps) {
   const provider = providersData.find(p => p.id === providerId) || providersData[0];
   
-  const [activeServices, setActiveServices] = useState<string[]>(['Wash']);
-  const [activeTime, setActiveTime] = useState('09:00 AM');
-  const [activeDate, setActiveDate] = useState<'Today' | 'Tomorrow'>('Today');
-
-  // Helper to check if a time slot is available
-  const isTimeSlotAvailable = (timeString: string) => {
-    if (activeDate === 'Tomorrow') return true;
-    
-    // Convert timeString (e.g. '02:00 PM') to 24h hour
-    const match = timeString.match(/(\d+):(\d+)\s+(AM|PM)/);
-    if (!match) return true;
-    
-    let hour = parseInt(match[1]);
-    const ampm = match[3];
-    if (ampm === 'PM' && hour < 12) hour += 12;
-    if (ampm === 'AM' && hour === 12) hour = 0;
-    
-    const currentHour = new Date().getHours();
-    // Disable if current hour is greater than or equal to the slot hour
-    return currentHour < hour;
-  };
-
-  const timeSlots = ['09:00 AM', '11:00 AM', '02:00 PM', '04:00 PM'];
-  
-  useEffect(() => {
-    if (activeDate === 'Today') {
-      const hasAvailableSlots = timeSlots.some(t => isTimeSlotAvailable(t));
-      if (!hasAvailableSlots) {
-        setActiveDate('Tomorrow');
-        setActiveTime('09:00 AM');
-      } else if (!isTimeSlotAvailable(activeTime)) {
-        // Switch to the first available time today
-        const firstAvailable = timeSlots.find(t => isTimeSlotAvailable(t));
-        if (firstAvailable) setActiveTime(firstAvailable);
-      }
-    }
-  }, [activeDate, activeTime]);
-  
-  const [items, setItems] = useState({
-    // Top Wear
-    shirts: { qty: 0, weight: 0.2, name: 'Shirts', category: 'Top Wear' },
-    tshirts: { qty: 0, weight: 0.15, name: 'T-Shirts', category: 'Top Wear' },
-    kurtas: { qty: 0, weight: 0.3, name: 'Kurtas', category: 'Top Wear' },
-    jackets: { qty: 0, weight: 0.8, name: 'Jackets', category: 'Top Wear' },
-    sweaters: { qty: 0, weight: 0.5, name: 'Sweaters', category: 'Top Wear' },
-    // Bottom Wear
-    jeans: { qty: 0, weight: 0.6, name: 'Jeans', category: 'Bottom Wear' },
-    trousers: { qty: 0, weight: 0.4, name: 'Trousers', category: 'Bottom Wear' },
-    chinos: { qty: 0, weight: 0.4, name: 'Chinos', category: 'Bottom Wear' },
-    salwars: { qty: 0, weight: 0.3, name: 'Salwars', category: 'Bottom Wear' },
-    trackpants: { qty: 0, weight: 0.3, name: 'Trackpants', category: 'Bottom Wear' },
-    // Traditional/Formal
-    sarees: { qty: 0, weight: 0.8, name: 'Sarees', category: 'Traditional/Formal' },
-    dhotis: { qty: 0, weight: 0.4, name: 'Dhotis', category: 'Traditional/Formal' },
-    sherwanis: { qty: 0, weight: 1.2, name: 'Sherwanis', category: 'Traditional/Formal' },
-    blazers: { qty: 0, weight: 0.9, name: 'Blazers', category: 'Traditional/Formal' },
-    // Household
-    bedsheets: { qty: 0, weight: 1.0, name: 'Bedsheets', category: 'Household' },
-    pillowcases: { qty: 0, weight: 0.2, name: 'Pillowcases', category: 'Household' },
-    blankets: { qty: 0, weight: 2.0, name: 'Blankets', category: 'Household' },
-    towels: { qty: 0, weight: 0.5, name: 'Towels', category: 'Household' },
-    curtains: { qty: 0, weight: 1.5, name: 'Curtains', category: 'Household' },
-  });
-
-  const [customItems, setCustomItems] = useState<{name: string, qty: number}[]>([]);
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [newCustomItemName, setNewCustomItemName] = useState('');
 
@@ -116,13 +70,64 @@ export default function BookingScreen({ providerId, onNavigate, onBookingComplet
     setCustomItems(prev => prev.filter((_, i) => i !== index));
   };
 
-  const totalWeight = Object.values(items).reduce((acc, item) => acc + (item.qty * item.weight), 0);
+  const totalWeight = Object.values(items).reduce((acc: number, item: any) => acc + (item.qty * item.weight), 0);
   
-  const baseServiceCost = activeServices.reduce((sum, service) => sum + ((provider as any).serviceRates?.[service] || provider.pricePerKg), 0);
+  const multiplierMap: Record<string, number> = {
+    'Wash': 1.0,
+    'Iron': 1.5,
+    'Dry Clean': 2.0
+  };
   
-  const customItemsQty = customItems.reduce((acc, item) => acc + item.qty, 0);
+  const maxMultiplier = activeServices.length > 0 
+    ? Math.max(...activeServices.map(service => multiplierMap[service] || 1.0))
+    : 0;
+    
+  const baseServiceCost = provider.pricePerKg * maxMultiplier;
+  
+  const customItemsQty = customItems.reduce((acc: number, item: any) => acc + item.qty, 0);
   
   const totalPrice = Math.round((totalWeight * baseServiceCost) + (customItemsQty * 40));
+
+  useEffect(() => {
+    setBookingTotal(totalPrice);
+  }, [totalPrice, setBookingTotal]);
+
+  const [activeTime, setActiveTime] = useState('09:00 AM');
+  const [activeDate, setActiveDate] = useState<'Today' | 'Tomorrow'>('Today');
+
+  // Helper to check if a time slot is available
+  const isTimeSlotAvailable = (timeString: string) => {
+    if (activeDate === 'Tomorrow') return true;
+    
+    // Convert timeString (e.g. '02:00 PM') to 24h hour
+    const match = timeString.match(/(\d+):(\d+)\s+(AM|PM)/);
+    if (!match) return true;
+    
+    let hour = parseInt(match[1]);
+    const ampm = match[3];
+    if (ampm === 'PM' && hour < 12) hour += 12;
+    if (ampm === 'AM' && hour === 12) hour = 0;
+    
+    const currentHour = new Date().getHours();
+    // Disable if current hour is greater than or equal to the slot hour
+    return currentHour < hour;
+  };
+
+  const timeSlots = ['09:00 AM', '11:00 AM', '02:00 PM', '04:00 PM'];
+  
+  useEffect(() => {
+    if (activeDate === 'Today') {
+      const hasAvailableSlots = timeSlots.some(t => isTimeSlotAvailable(t));
+      if (!hasAvailableSlots) {
+        setActiveDate('Tomorrow');
+        setActiveTime('09:00 AM');
+      } else if (!isTimeSlotAvailable(activeTime)) {
+        // Switch to the first available time today
+        const firstAvailable = timeSlots.find(t => isTimeSlotAvailable(t));
+        if (firstAvailable) setActiveTime(firstAvailable);
+      }
+    }
+  }, [activeDate, activeTime]);
 
   const categories = ['Top Wear', 'Bottom Wear', 'Traditional/Formal', 'Household'];
 
@@ -157,6 +162,11 @@ export default function BookingScreen({ providerId, onNavigate, onBookingComplet
                 {tab.label}
               </button>
             ))}
+          </div>
+          <div className="mt-3 p-3 bg-bg-card border border-border-color rounded-xl flex flex-col gap-1">
+            <p className="text-[11px] text-text-secondary"><strong className="text-text-primary font-semibold">Wash & Fold:</strong> Base Price (₹{provider.pricePerKg}/kg)</p>
+            <p className="text-[11px] text-text-secondary"><strong className="text-text-primary font-semibold">Ironing:</strong> 1.5x Base Price (₹{Math.round(provider.pricePerKg * 1.5)}/kg)</p>
+            <p className="text-[11px] text-text-secondary"><strong className="text-text-primary font-semibold">Dry Clean:</strong> 2.0x Base Price (₹{Math.round(provider.pricePerKg * 2.0)}/kg)</p>
           </div>
         </div>
 

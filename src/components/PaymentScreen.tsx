@@ -5,9 +5,10 @@ import type { ScreenName } from '../App';
 interface PaymentScreenProps {
   onNavigate: (screen: ScreenName) => void;
   onPaymentSuccess?: (method: string) => void;
+  bookingTotal: number;
 }
 
-export default function PaymentScreen({ onNavigate, onPaymentSuccess }: PaymentScreenProps) {
+export default function PaymentScreen({ onNavigate, onPaymentSuccess, bookingTotal }: PaymentScreenProps) {
   const [activeMethod, setActiveMethod] = useState('card');
 
   const paymentMethods = [
@@ -37,7 +38,7 @@ export default function PaymentScreen({ onNavigate, onPaymentSuccess }: PaymentS
       <div className="flex-1 overflow-y-auto px-6 pb-32 no-scrollbar">
         <div className="text-center py-8 pb-10">
           <p className="text-sm text-text-secondary mb-1">Total to Pay</p>
-          <h2 className="text-4xl font-extrabold text-accent-primary">₹320.00</h2>
+          <h2 className="text-4xl font-extrabold text-accent-primary">₹{bookingTotal.toFixed(2)}</h2>
         </div>
 
         <div className="flex flex-col bg-bg-card border border-border-color rounded-2xl shadow-sm overflow-hidden mb-8">
