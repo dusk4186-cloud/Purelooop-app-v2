@@ -64,20 +64,36 @@ export type ScreenName =
   | 'edit-profile';
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<ScreenName>('splash');
-  const [session, setSession] = useState<any>(null);
-  const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
-  const [hasActiveOrder, setHasActiveOrder] = useState(false);
-  const [activeOrderDetails, setActiveOrderDetails] = useState<{date: string, time: string} | null>(null);
+  const [currentScreen, setCurrentScreen] = useState<ScreenName>('tracking');
+  const [session, setSession] = useState<any>({ uid: '123', displayName: 'Test User' });
+  const [selectedProvider, setSelectedProvider] = useState<string | null>('prov-1');
+  const [hasActiveOrder, setHasActiveOrder] = useState(true);
+  const [activeOrderDetails, setActiveOrderDetails] = useState<{date: string, time: string} | null>({ date: 'Today', time: '10:00 AM' });
   const [paymentMethod, setPaymentMethod] = useState<string>('card');
   const [userAddress, setUserAddress] = useState<string>('B-402, Royal Residency, MG Road, Bengaluru, 560001');
   const [userCity, setUserCity] = useState<string>('Bengaluru');
 
   // Lifted Cart State
-  const [cartItems, setCartItems] = useState(INITIAL_ITEMS);
-  const [activeServices, setActiveServices] = useState<string[]>(['Wash']);
-  const [customItems, setCustomItems] = useState<{name: string, qty: number}[]>([]);
-  const [bookingTotal, setBookingTotal] = useState(0);
+  const [cartItemsByService, setCartItemsByService] = useState<Record<string, typeof INITIAL_ITEMS>>({
+    'WashFold': [
+      { id: 'tshirt', name: 'T-Shirt', qty: 2, weight: 0.2 },
+      { id: 'trouser', name: 'Trousers', qty: 1, weight: 0.4 },
+    ],
+    'DryClean': [
+      { id: 'blazer', name: 'Blazer/Suit', qty: 1, weight: 0 },
+    ]
+  });
+  const [activeTab, setActiveTab] = useState<string>('WashFold');
+  const [customItemsByService, setCustomItemsByService] = useState<Record<string, {name: string, qty: number}[]>>({});
+  const [bookingTotal, setBookingTotal] = useState(500);
+
+  const getActiveServicesList = () => {
+    return Object.keys(cartItemsByService).filter(serviceId => {
+       const hasItems = Object.values(cartItemsByService[serviceId] ?? {}).some((item: any) => item.qty > 0);
+       const hasCustom = (customItemsByService[serviceId] ?? []).length > 0;
+       return hasItems || hasCustom;
+    });
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -121,7 +137,18 @@ export default function App() {
       case 'check-email':
         return <AuthScreens currentScreen={currentScreen} onNavigate={setCurrentScreen} onSignupAddress={setUserAddress} onSignupCity={setUserCity} />;
       case 'home':
-        return <HomeScreen onNavigate={setCurrentScreen} onSelectProvider={setSelectedProvider} userCity={userCity} />;
+        return <HomeScreen onNavigate={setCurrentScreen} onSelectProvider={(id, serviceHint) => {
+          if (id !== selectedProvider) {
+            setCartItemsByService({});
+            setCustomItemsByService({});
+          }
+          if (serviceHint) {
+            setActiveTab(serviceHint);
+          } else {
+            setActiveTab('WashFold'); // default
+          }
+          setSelectedProvider(id);
+        }} userCity={userCity} />;
       case 'profile':
         return <ProfileScreen onNavigate={setCurrentScreen} />;
       case 'provider':
@@ -132,22 +159,25 @@ export default function App() {
                   onNavigate={setCurrentScreen} 
                   onBookingComplete={setActiveOrderDetails} 
                   userAddress={userAddress} 
-                  cartItems={cartItems}
-                  setCartItems={setCartItems}
-                  activeServices={activeServices}
-                  setActiveServices={setActiveServices}
-                  customItems={customItems}
-                  setCustomItems={setCustomItems}
+                  cartItemsByService={cartItemsByService}
+                  setCartItemsByService={setCartItemsByService}
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  customItemsByService={customItemsByService}
+                  setCustomItemsByService={setCustomItemsByService}
                   setBookingTotal={setBookingTotal}
                />;
       case 'payment':
         return <PaymentScreen 
                   onNavigate={setCurrentScreen} 
                   bookingTotal={bookingTotal}
+                  cartItemsByService={cartItemsByService}
+                  customItemsByService={customItemsByService}
+                  providerId={selectedProvider}
                   onPaymentSuccess={(method) => { setHasActiveOrder(true); setPaymentMethod(method); }} 
                />;
       case 'tracking':
-        return <TrackingScreen onNavigate={setCurrentScreen} hasActiveOrder={hasActiveOrder} activeOrderDetails={activeOrderDetails} paymentMethod={paymentMethod} />;
+        return <TrackingScreen onNavigate={setCurrentScreen} hasActiveOrder={hasActiveOrder} activeOrderDetails={activeOrderDetails} paymentMethod={paymentMethod} activeServices={getActiveServicesList()} />;
       case 'edit-profile':
         return <EditProfileScreen onNavigate={setCurrentScreen} />;
       case 'addresses':

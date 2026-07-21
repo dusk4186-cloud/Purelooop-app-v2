@@ -6,7 +6,7 @@ import { auth } from '../lib/firebase';
 
 interface HomeProps {
   onNavigate: (screen: ScreenName) => void;
-  onSelectProvider: (id: string) => void;
+  onSelectProvider: (id: string, serviceHint?: string) => void;
   userCity?: string;
 }
 
@@ -101,8 +101,7 @@ export default function HomeScreen({ onNavigate, onSelectProvider, userCity }: H
 
         {/* Services */}
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-sm font-semibold text-text-primary">Services</h3>
-          <span className="text-xs font-medium text-accent-primary">View All</span>
+          <h3 className="text-sm font-semibold text-text-primary">Services Provided</h3>
         </div>
         <div className="flex gap-4 mb-8 overflow-x-auto no-scrollbar pb-2">
           {services.map(s => {
@@ -144,7 +143,7 @@ export default function HomeScreen({ onNavigate, onSelectProvider, userCity }: H
               <div 
                 key={provider.id}
                 onClick={() => {
-                  onSelectProvider(provider.id);
+                  onSelectProvider(provider.id, activeService === 'Iron' ? 'Iron' : activeService === 'Dry Clean' ? 'DryClean' : undefined);
                   onNavigate('provider');
                 }}
                 className="bg-bg-card border border-border-color rounded-3xl p-5 flex gap-5 items-start cursor-pointer active:scale-[0.98] transition-transform shadow-sm hover:border-action-primary/30"
