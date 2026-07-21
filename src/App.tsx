@@ -64,11 +64,11 @@ export type ScreenName =
   | 'edit-profile';
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<ScreenName>('tracking');
-  const [session, setSession] = useState<any>({ uid: '123', displayName: 'Test User' });
-  const [selectedProvider, setSelectedProvider] = useState<string | null>('prov-1');
-  const [hasActiveOrder, setHasActiveOrder] = useState(true);
-  const [activeOrderDetails, setActiveOrderDetails] = useState<{date: string, time: string} | null>({ date: 'Today', time: '10:00 AM' });
+  const [currentScreen, setCurrentScreen] = useState<ScreenName>('splash');
+  const [session, setSession] = useState<any>(null);
+  const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
+  const [hasActiveOrder, setHasActiveOrder] = useState(false);
+  const [activeOrderDetails, setActiveOrderDetails] = useState<{date: string, time: string} | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string>('card');
   const [userAddress, setUserAddress] = useState<string>('B-402, Royal Residency, MG Road, Bengaluru, 560001');
   const [userCity, setUserCity] = useState<string>('Bengaluru');
