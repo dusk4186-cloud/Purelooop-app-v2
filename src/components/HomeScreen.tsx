@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Home, FileText, Bell, User, X } from 'lucide-react';
+import { Search, Home, FileText, Bell, User, X, Percent, Tag, Gift } from 'lucide-react';
 import type { ScreenName } from '../App';
 import { providersData } from '../lib/mockData';
 import { auth } from '../lib/firebase';
@@ -14,6 +14,7 @@ export default function HomeScreen({ onNavigate, onSelectProvider, userCity }: H
   const [searchQuery, setSearchQuery] = useState('');
   const [activeService, setActiveService] = useState<string | null>(null);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [showDiscountsModal, setShowDiscountsModal] = useState(false);
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good Morning,' : hour < 18 ? 'Good Afternoon,' : 'Good Evening,';
@@ -22,6 +23,12 @@ export default function HomeScreen({ onNavigate, onSelectProvider, userCity }: H
     { name: 'Wash', icon: '👕' },
     { name: 'Iron', icon: '👔' },
     { name: 'Dry Clean', icon: '🧥' }
+  ];
+
+  const discounts = [
+    { code: 'FIRST50', title: '50% Off First Order', desc: 'Get 50% off up to ₹100 on your very first laundry booking.', badge: 'Welcome Deal' },
+    { code: 'PURESTUDENT', title: 'Student Bundle Saver', desc: 'Flat ₹150 off on monthly student laundry packages above 15kg.', badge: 'Package Deal' },
+    { code: 'WEEKEND30', title: '30% Off Express Ironing', desc: 'Save 30% on all Steam Ironing bookings placed on weekends.', badge: 'Weekend Offer' }
   ];
 
   const handleServiceClick = (serviceName: string) => {
@@ -53,6 +60,36 @@ export default function HomeScreen({ onNavigate, onSelectProvider, userCity }: H
               </div>
               <p className="text-text-primary font-medium text-lg">All caught up!</p>
               <p className="text-text-secondary text-sm">No new notifications right now.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Discounts Modal */}
+      {showDiscountsModal && (
+        <div className="absolute inset-0 bg-black/60 z-50 flex items-end justify-center animate-in fade-in">
+          <div className="bg-bg-card w-full max-h-[80%] rounded-t-3xl p-6 pb-12 overflow-y-auto animate-in slide-in-from-bottom-8 no-scrollbar">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center gap-2">
+                <Percent className="w-6 h-6 text-accent-primary" />
+                <h3 className="text-xl font-bold text-text-primary">Discounts & Offers</h3>
+              </div>
+              <button onClick={() => setShowDiscountsModal(false)} className="text-text-secondary bg-bg-elevated p-2 rounded-full">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {discounts.map(d => (
+                <div key={d.code} className="bg-bg-elevated border border-border-color p-4 rounded-2xl relative shadow-sm">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-[10px] font-bold text-accent-primary uppercase tracking-wider bg-accent-primary/10 px-2.5 py-1 rounded-full">{d.badge}</span>
+                    <span className="text-xs font-mono font-bold text-text-primary bg-bg-card px-2 py-1 rounded border border-border-color/50">{d.code}</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-text-primary mb-1">{d.title}</h4>
+                  <p className="text-xs text-text-secondary leading-relaxed">{d.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -103,7 +140,7 @@ export default function HomeScreen({ onNavigate, onSelectProvider, userCity }: H
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-sm font-semibold text-text-primary">Services Provided</h3>
         </div>
-        <div className="flex gap-4 mb-8 overflow-x-auto no-scrollbar pb-2">
+        <div className="flex gap-4 mb-6 overflow-x-auto no-scrollbar pb-2">
           {services.map(s => {
             const isActive = activeService === s.name;
             return (
@@ -123,6 +160,23 @@ export default function HomeScreen({ onNavigate, onSelectProvider, userCity }: H
               </div>
             );
           })}
+        </div>
+
+        {/* Discounts Banner Bar */}
+        <div 
+          onClick={() => setShowDiscountsModal(true)}
+          className="mb-8 p-4 rounded-2xl bg-gradient-to-r from-accent-primary/20 via-accent-primary/10 to-transparent border border-accent-primary/30 flex items-center justify-between cursor-pointer shadow-sm hover:border-accent-primary transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-accent-primary/20 flex items-center justify-center text-accent-primary font-bold">
+              %
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-text-primary">Special Discounts & Offers</h4>
+              <p className="text-[11px] text-text-secondary">Save up to 50% on student bundles & packages</p>
+            </div>
+          </div>
+          <span className="text-xs font-bold text-accent-primary">View →</span>
         </div>
 
         {/* Providers List */}
@@ -153,10 +207,10 @@ export default function HomeScreen({ onNavigate, onSelectProvider, userCity }: H
                 </div>
                 <div className="flex-1 min-w-0 pb-1">
                   <h4 className="text-[15px] font-bold text-text-primary mb-1.5 leading-tight">{provider.name}</h4>
-                  <p className="text-[13px] text-text-secondary mb-3 leading-snug line-clamp-3">{provider.address}</p>
+                  <p className="text-[13px] text-text-secondary mb-3 leading-snug line-clamp-2">{provider.address}</p>
                   <div className="flex justify-between items-end">
-                    <span className="text-[13px] font-bold text-amber-500 flex items-center gap-1.5">
-                      ⭐ {provider.rating}
+                    <span className="text-[12px] font-bold text-amber-500 flex items-center gap-1.5">
+                      ⭐ {provider.rating} <span className="text-text-muted font-normal">| {provider.turnaroundTime || '24–48 hrs'}</span>
                     </span>
                     <span className="text-[15px] font-extrabold text-accent-primary leading-none">₹{provider.pricePerKg}/kg</span>
                   </div>

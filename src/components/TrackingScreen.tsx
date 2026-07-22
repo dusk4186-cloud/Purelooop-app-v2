@@ -19,18 +19,27 @@ export default function TrackingScreen({ onNavigate, hasActiveOrder = false, act
   const [rating, setRating] = useState(0);
 
   const now = new Date();
+  const currentHour = now.getHours();
   const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
   const time1 = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   
   now.setMinutes(now.getMinutes() + 15);
   const time2 = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-  const isScheduled = activeOrderDetails?.date === 'Tomorrow';
+  // Store operating hours are 9:00 AM (8h) to 8:00 PM (20h)
+  const isOutsideOperatingHours = currentHour < 8 || currentHour >= 20;
 
-  const baseStatuses = isScheduled 
+  // Determine if pickup should show as scheduled vs instant driver dispatch
+  let scheduledDesc = activeOrderDetails
+    ? `${activeOrderDetails.date}, ${activeOrderDetails.time}`
+    : isOutsideOperatingHours
+      ? (currentHour < 8 ? `Today, 09:00 AM` : `Tomorrow, 09:00 AM`)
+      : null;
+
+  const baseStatuses = scheduledDesc
     ? [
         { title: 'Order Placed', desc: `${dateStr}, ${time1}`, active: true, completed: true },
-        { title: 'Pickup Scheduled', desc: `Tomorrow, ${activeOrderDetails?.time}`, active: true, completed: false }
+        { title: 'Pickup Scheduled', desc: scheduledDesc, active: true, completed: false }
       ]
     : [
         { title: 'Order Placed', desc: `${dateStr}, ${time1}`, active: true, completed: true },
@@ -61,12 +70,12 @@ export default function TrackingScreen({ onNavigate, hasActiveOrder = false, act
       id: 'ORD-4012',
       date: 'July 15, 2026',
       provider: 'EcoWash',
-      items: '3 Wash & Fold, 1 Iron Only',
+      items: 'Wash & Fold, Wash & Iron',
       total: '₹340',
       status: 'Delivered',
       details: [
-        { label: 'Wash & Fold Pile (1.2 kg)', price: '₹96' },
-        { label: 'Iron Only (1 piece)', price: '₹60' },
+        { label: 'Wash & Fold Pile (2.5 kg)', price: '₹200' },
+        { label: 'Wash & Iron Pile (0.9 kg)', price: '₹103' },
         { label: 'Platform Fee', price: '₹15' },
         { label: 'Taxes', price: '₹22' }
       ]
@@ -75,11 +84,11 @@ export default function TrackingScreen({ onNavigate, hasActiveOrder = false, act
       id: 'ORD-3899',
       date: 'June 28, 2026',
       provider: 'Iron Master',
-      items: '5 Steam Iron',
-      total: '₹300',
+      items: 'Iron Only (4.5 kg)',
+      total: '₹285',
       status: 'Delivered',
       details: [
-        { label: 'Steam Iron (5 pieces)', price: '₹300' },
+        { label: 'Iron Only (4.5 kg)', price: '₹270' },
         { label: 'Platform Fee', price: '₹15' }
       ]
     },

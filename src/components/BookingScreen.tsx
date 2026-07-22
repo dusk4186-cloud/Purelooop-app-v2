@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, MapPin, Edit3, Plus, X } from 'lucide-react';
+import { ArrowLeft, MapPin, Edit3, Plus, X, ChevronDown, ChevronUp, Gift, Tag } from 'lucide-react';
 import type { ScreenName } from '../App';
 import { providersData } from '../lib/mockData';
 import { INITIAL_ITEMS } from '../lib/constants';
@@ -35,6 +35,8 @@ export default function BookingScreen({
   
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [newCustomItemName, setNewCustomItemName] = useState('');
+  const [showPackages, setShowPackages] = useState(false);
+  const [showPromos, setShowPromos] = useState(false);
 
   useEffect(() => {
     if (provider && !provider.services.includes(activeTab)) {
@@ -215,6 +217,69 @@ export default function BookingScreen({
             {activeTab === 'DryClean' && (
                <p className="text-[11px] text-text-secondary"><strong className="text-text-primary font-semibold">Dry Cleaning:</strong> Billed per piece (₹99 - ₹299/item)</p>
             )}
+          </div>
+
+          {/* Special Offers Section */}
+          <div className="mt-4 space-y-2">
+            <h4 className="text-xs font-semibold text-accent-primary uppercase tracking-wider mb-2">Special Offers</h4>
+            
+            {/* Packages Collapsible */}
+            <div className="bg-bg-card border border-border-color rounded-xl overflow-hidden">
+              <button 
+                onClick={() => setShowPackages(!showPackages)}
+                className="w-full p-3 flex justify-between items-center text-xs font-bold text-text-primary hover:bg-bg-elevated/50 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Gift className="w-4 h-4 text-accent-primary" />
+                  <span>Packages</span>
+                </div>
+                {showPackages ? <ChevronUp className="w-4 h-4 text-text-secondary" /> : <ChevronDown className="w-4 h-4 text-text-secondary" />}
+              </button>
+              {showPackages && (
+                <div className="p-3 pt-0 border-t border-border-color/50 text-xs text-text-secondary space-y-2 animate-in fade-in">
+                  <div className="p-2.5 rounded-lg bg-bg-elevated border border-border-color/50">
+                    <div className="font-bold text-text-primary mb-0.5">🎓 Student Monthly Saver (15 kg)</div>
+                    <div className="text-[11px] text-accent-primary font-semibold">₹899 / month (Save ₹300)</div>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-bg-elevated border border-border-color/50">
+                    <div className="font-bold text-text-primary mb-0.5">🏡 Household Family Pack (35 kg)</div>
+                    <div className="text-[11px] text-accent-primary font-semibold">₹1,999 / month (Save ₹800)</div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Other Promotional Offers Collapsible */}
+            <div className="bg-bg-card border border-border-color rounded-xl overflow-hidden">
+              <button 
+                onClick={() => setShowPromos(!showPromos)}
+                className="w-full p-3 flex justify-between items-center text-xs font-bold text-text-primary hover:bg-bg-elevated/50 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Tag className="w-4 h-4 text-accent-primary" />
+                  <span>Other Promotional Offers</span>
+                </div>
+                {showPromos ? <ChevronUp className="w-4 h-4 text-text-secondary" /> : <ChevronDown className="w-4 h-4 text-text-secondary" />}
+              </button>
+              {showPromos && (
+                <div className="p-3 pt-0 border-t border-border-color/50 text-xs text-text-secondary space-y-2 animate-in fade-in">
+                  <div className="p-2.5 rounded-lg bg-bg-elevated border border-border-color/50 flex justify-between items-center">
+                    <div>
+                      <div className="font-bold text-text-primary">FIRST50</div>
+                      <div className="text-[11px] text-text-secondary">50% off on first order up to ₹100</div>
+                    </div>
+                    <span className="text-[10px] font-bold bg-accent-primary/20 text-accent-primary px-2 py-1 rounded">ACTIVE</span>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-bg-elevated border border-border-color/50 flex justify-between items-center">
+                    <div>
+                      <div className="font-bold text-text-primary">FREEFABRIC</div>
+                      <div className="text-[11px] text-text-secondary">Free fabric softener add-on</div>
+                    </div>
+                    <span className="text-[10px] font-bold bg-accent-primary/20 text-accent-primary px-2 py-1 rounded">ACTIVE</span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

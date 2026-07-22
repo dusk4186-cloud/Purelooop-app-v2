@@ -74,18 +74,10 @@ export default function App() {
   const [userCity, setUserCity] = useState<string>('Bengaluru');
 
   // Lifted Cart State
-  const [cartItemsByService, setCartItemsByService] = useState<Record<string, typeof INITIAL_ITEMS>>({
-    'WashFold': [
-      { id: 'tshirt', name: 'T-Shirt', qty: 2, weight: 0.2 },
-      { id: 'trouser', name: 'Trousers', qty: 1, weight: 0.4 },
-    ],
-    'DryClean': [
-      { id: 'blazer', name: 'Blazer/Suit', qty: 1, weight: 0 },
-    ]
-  });
+  const [cartItemsByService, setCartItemsByService] = useState<Record<string, typeof INITIAL_ITEMS>>({});
   const [activeTab, setActiveTab] = useState<string>('WashFold');
   const [customItemsByService, setCustomItemsByService] = useState<Record<string, {name: string, qty: number}[]>>({});
-  const [bookingTotal, setBookingTotal] = useState(500);
+  const [bookingTotal, setBookingTotal] = useState(0);
 
   const getActiveServicesList = () => {
     return Object.keys(cartItemsByService).filter(serviceId => {
@@ -174,7 +166,13 @@ export default function App() {
                   cartItemsByService={cartItemsByService}
                   customItemsByService={customItemsByService}
                   providerId={selectedProvider}
-                  onPaymentSuccess={(method) => { setHasActiveOrder(true); setPaymentMethod(method); }} 
+                  onPaymentSuccess={(method) => { 
+                    setHasActiveOrder(true); 
+                    setPaymentMethod(method); 
+                    setCartItemsByService({});
+                    setCustomItemsByService({});
+                    setBookingTotal(0);
+                  }} 
                />;
       case 'tracking':
         return <TrackingScreen onNavigate={setCurrentScreen} hasActiveOrder={hasActiveOrder} activeOrderDetails={activeOrderDetails} paymentMethod={paymentMethod} activeServices={getActiveServicesList()} />;
