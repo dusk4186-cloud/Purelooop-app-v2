@@ -1,0 +1,49 @@
+{
+  "_comment": "PureLoop — Laundry App Prototype Design Tokens. Pass via: python push_to_figma.py screen.html --tokens C:\\Users\\ASUS\\.gemini\\antigravity\\scratch\\laundry-app-prototype",
+  "project": "PureLoop",
+  "colors": {
+    "--background": "#F8FAFC",
+    "--foreground": "#0F172A",
+    "--card": "#FFFFFF",
+    "--elevated": "#F1F5F9",
+    "--alt": "#E2E8F0",
+    "--text-primary": "#0F172A",
+    "--text-secondary": "#64748B",
+    "--text-muted": "#94A3B8",
+    "--primary": "#007367",
+    "--primary-foreground": "#FFFFFF",
+    "--action-secondary": "#0F172A",
+    "--border": "#E2E8F0",
+    "--accent-glow": "rgba(0, 115, 103, 0.2)"
+  },
+  "colors_dark": {
+    "--background": "#060e17",
+    "--foreground": "#e0eaf0",
+    "--card": "#0A1624",
+    "--elevated": "#122236",
+    "--alt": "#0b1824",
+    "--text-primary": "#e0eaf0",
+    "--text-secondary": "#8fa8bc",
+    "--text-muted": "#5a7a8e",
+    "--primary": "#00E7D2",
+    "--primary-foreground": "#020617",
+    "--action-secondary": "#4D78D3",
+    "--border": "#1E293B",
+    "--accent-glow": "rgba(0, 231, 210, 0.2)"
+  },
+  "typography": {
+    "--text-title": "32px",
+    "--text-heading": "24px",
+    "--text-subheading": "18px",
+    "--text-label": "16px",
+    "--text-body": "14px",
+    "--text-micro": "10px"
+  },
+  "radius": {
+    "--radius-sm": "8px",
+    "--radius-md": "12px",
+    "--radius-lg": "16px",
+    "--radius-xl": "24px",
+    "--radius-full": "999px"
+  }
+}

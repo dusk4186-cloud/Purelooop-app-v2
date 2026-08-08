@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PureLoop - Laundry App Prototype</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Ionicons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+    
+    <!-- Controls outside the app -->
+    <div class="prototype-controls">
+        <button id="theme-toggle" class="control-btn">
+            <ion-icon name="sunny-outline"></ion-icon>
+            <span>Light Mode</span>
+        </button>
+        <button id="restart-btn" class="control-btn">
+            <ion-icon name="refresh-outline"></ion-icon>
+            <span>Restart</span>
+        </button>
+    </div>
+
+    <div class="device-mockup">
+        <div class="device-screen" id="app-root">
+            <div id="toast-container" style="position:absolute; bottom:120px; left:50%; transform:translateX(-50%); z-index:9999; display:flex; flex-direction:column; gap:8px; pointer-events:none;"></div>
+            
+            <!-- Splash Screen -->
+            <section id="splash" class="app-screen active">
+                <div class="splash-content">
+                    <div class="custom-loader-wrapper">
+                        <div class="custom-loader-logo">
+                            <div class="machine-box">
+                                <ion-icon name="water" class="waves-icon"></ion-icon>
+                            </div>
+                            <ion-icon name="sparkles" class="sparkle s1"></ion-icon>
+                            <ion-icon name="sparkles" class="sparkle s2"></ion-icon>
+                        </div>
+                        <h1 class="brand-title">PureLoop</h1>
+                        <p class="brand-subtitle">Refresh. Rinse. Repeat.</p>
+                        
+                        <div class="spinning-dots">
+                            <div class="dot d1"></div>
+                            <div class="dot d2"></div>
+                            <div class="dot d3"></div>
+                            <div class="dot d4"></div>
+                            <div class="dot d5"></div>
+                            <div class="dot d6"></div>
+                            <div class="dot d7"></div>
+                            <div class="dot d8"></div>
+                        </div>
+                        
+                        <p class="slogan-bottom">Laundry made effortless</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Onboarding / Welcome -->
+            <section id="onboarding" class="app-screen">
+                <div class="illustration-container">
+                    <!-- Abstract geometric illustration representing laundry/cleanliness -->
+                    <div class="abstract-art">
+                        <div class="circle c1"></div>
+                        <div class="circle c2"></div>
+                        <ion-icon name="shirt-outline" class="art-icon"></ion-icon>
+                    </div>
+                </div>
+                <div class="onboarding-text">
+                    <h2>Premium Care For Your Clothes</h2>
+                    <p>Experience hassle-free, professional laundry services at your doorstep.</p>
+                </div>
+                <div class="onboarding-actions">
+                    <button class="btn btn-primary" onclick="navigate('home')">Get Started</button>
+                    <button class="btn btn-secondary" onclick="navigate('login')">Log In</button>
+                </div>
+            </section>
+
+            <!-- Login Screen -->
+            <section id="login" class="app-screen">
+                <header class="app-header">
+                    <button class="icon-btn back-btn" onclick="navigate('onboarding')"><ion-icon name="arrow-back-outline"></ion-icon></button>
+                    <h3>Log In</h3>
+                    <div style="width:24px"></div>
+                </header>
+                <div class="screen-content scrollable">
+                    <div class="auth-form">
+                        <div class="input-group">
+                            <label>Email</label>
+                            <input type="email" id="login-email" placeholder="aditya@example.com" oninput="validateLogin()">
+                        </div>
+                        <div class="input-group">
+                            <label>Password</label>
+                            <div class="password-wrapper" style="position:relative;">
+                                <input type="password" id="login-password" placeholder="••••••••" oninput="validateLogin()" style="width:100%;">
+                                <ion-icon name="eye-outline" onclick="togglePassword('login-password', this)" style="position:absolute; right:16px; top:50%; transform:translateY(-50%); color:var(--text-secondary); cursor:pointer; font-size:20px;"></ion-icon>
+                            </div>
+                        </div>
+                        <button id="login-btn" class="btn btn-primary full-width" onclick="simulateLogin()" style="margin-top: 16px;" disabled>Log In</button>
+                        <p class="auth-link">Don't have an account? <a href="#" onclick="navigate('signup')">Sign Up</a></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Signup Screen -->
+            <section id="signup" class="app-screen">
+                <header class="app-header">
+                    <button class="icon-btn back-btn" onclick="navigate('login')"><ion-icon name="arrow-back-outline"></ion-icon></button>
+                    <h3>Sign Up</h3>
+                    <div style="width:24px"></div>
+                </header>
+                <div class="screen-content scrollable">
+                    <div class="auth-form">
+                        <div class="input-group">
+                            <label>Full Name</label>
+                            <input type="text" id="signup-name" placeholder="Aditya" oninput="validateSignup()">
+                        </div>
+                        <div class="input-group">
+                            <label>Email</label>
+                            <input type="email" id="signup-email" placeholder="aditya@example.com" oninput="validateSignup()">
+                        </div>
+                        <div class="input-group">
+                            <label>Password</label>
+                            <div class="password-wrapper" style="position:relative;">
+                                <input type="password" id="signup-password" placeholder="••••••••" oninput="validateSignup()" style="width:100%;">
+                                <ion-icon name="eye-outline" onclick="togglePassword('signup-password', this)" style="position:absolute; right:16px; top:50%; transform:translateY(-50%); color:var(--text-secondary); cursor:pointer; font-size:20px;"></ion-icon>
+                            </div>
+                        </div>
+                        <button id="signup-btn" class="btn btn-primary full-width" onclick="simulateSignup()" style="margin-top: 16px;" disabled>Create Account</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- OTP Screen -->
+            <section id="otp" class="app-screen">
+                <header class="app-header">
+                    <button class="icon-btn back-btn" onclick="navigate('signup')"><ion-icon name="arrow-back-outline"></ion-icon></button>
+                    <h3>Verify Email</h3>
+                    <div style="width:24px"></div>
+                </header>
+                <div class="screen-content scrollable">
+                    <div class="auth-form" style="text-align: center;">
+                        <ion-icon name="mail-unread-outline" style="font-size: 64px; color: var(--accent-primary); margin-bottom: 24px; display:block; margin-left:auto; margin-right:auto;"></ion-icon>
+                        <p style="margin-bottom: 12px;">We've sent a 4-digit OTP to your email. Enter it below to verify.</p>
+                        <p id="otp-timer-text" style="color:var(--accent-primary); font-weight:600; margin-bottom:24px; font-size: 18px;">01:00</p>
+                        <div class="otp-inputs" style="display: flex; gap: 12px; justify-content: center; margin-bottom: 24px;">
+                            <input type="text" maxlength="1" class="otp-box">
+                            <input type="text" maxlength="1" class="otp-box">
+                            <input type="text" maxlength="1" class="otp-box">
+                            <input type="text" maxlength="1" class="otp-box">
+                        </div>
+                        <button class="btn btn-primary full-width" onclick="verifyOtp()">Verify & Continue</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Home Screen -->
+            <section id="home" class="app-screen">
+                <header class="app-header">
+                    <div class="header-left">
+                        <div class="user-avatar" onclick="navigate('profile-screen')" style="cursor:pointer;">
+                            <img src="https://i.pravatar.cc/100?img=12" alt="User">
+                        </div>
+                        <div class="greeting">
+                            <span class="greeting-time">Good Morning,</span>
+                            <span class="user-name">Aditya</span>
+                        </div>
+                    </div>
+                    <button class="icon-btn" onclick="navigate('notifications-screen')"><ion-icon name="notifications-outline"></ion-icon></button>
+                </header>
+
+                <div class="screen-content scrollable">
+                    <!-- Search -->
+                    <div class="search-bar">
+                        <ion-icon name="search-outline"></ion-icon>
+                        <input type="text" id="search-input" placeholder="Search providers by name...">
+                    </div>
+
+                    <!-- Services Categories -->
+                    <div class="section-header">
+                        <h3>Our Services</h3>
+                    </div>
+                    <div class="services-row">
+                        <div class="service-card active">
+                            <div class="icon-wrapper"><ion-icon name="water-outline"></ion-icon></div>
+                            <span>Wash</span>
+                        </div>
+                        <div class="service-card">
+                            <div class="icon-wrapper"><ion-icon name="shirt-outline"></ion-icon></div>
+                            <span>Iron</span>
+                        </div>
+                        <div class="service-card">
+                            <div class="icon-wrapper"><ion-icon name="sparkles-outline"></ion-icon></div>
+                            <span>Dry Clean</span>
+                        </div>
+                    </div>
+
+                    <!-- Top Providers -->
+                    <div class="section-header">
+                        <h3>Top Providers near Andheri, Mumbai</h3>
+                        <a href="#" class="view-all">View All</a>
+                    </div>
+                    
+                    <div class="provider-list" id="provider-list">
+                        <!-- Provider cards will be rendered dynamically by script.js -->
+                    </div>
+                </div>
+
+                <!-- Bottom Nav -->
+                <nav class="bottom-nav">
+                    <a href="#" class="nav-item active" onclick="navigate('home')"><ion-icon name="home"></ion-icon></a>
+                    <a href="#" class="nav-item" onclick="navigate('calendar-screen')"><ion-icon name="calendar-outline"></ion-icon></a>
+                    <a href="#" class="nav-item" onclick="navigate('chat-screen')"><ion-icon name="chatbubble-outline"></ion-icon></a>
+                    <a href="#" class="nav-item" onclick="navigate('profile-screen')"><ion-icon name="person-outline"></ion-icon></a>
+                </nav>
+            </section>
+
+            <!-- Provider Profile Screen -->
+            <section id="provider" class="app-screen">
+                <header class="app-header transparent">
+                    <button class="icon-btn back-btn" onclick="navigate('home')"><ion-icon name="arrow-back-outline"></ion-icon></button>
+                    <button class="icon-btn"><ion-icon name="heart-outline"></ion-icon></button>
+                </header>
+
+                <div class="screen-content scrollable no-top-padding">
+                    <div class="provider-hero">
+                        <div class="hero-icon" id="provider-hero-icon"><ion-icon name="business-outline"></ion-icon></div>
+                    </div>
+                    
+                    <div class="provider-details">
+                        <div class="title-row">
+                            <h2 id="provider-name">AquaWash Premium</h2>
+                            <div class="badge-verified"><ion-icon name="checkmark-circle"></ion-icon></div>
+                        </div>
+                        <p class="address-full" id="provider-address"><ion-icon name="location-outline"></ion-icon> Lokhandwala Complex, Andheri West, Mumbai</p>
+                        
+                        <div class="stats-row">
+                            <div class="stat">
+                                <span class="stat-val" id="provider-rating"><ion-icon name="star"></ion-icon> 4.8</span>
+                                <span class="stat-label">120+ Reviews</span>
+                            </div>
+                            <div class="divider"></div>
+                            <div class="stat">
+                                <span class="stat-val" id="provider-price">₹60</span>
+                                <span class="stat-label">Per Kg (Base)</span>
+                            </div>
+                            <div class="divider"></div>
+                            <div class="stat">
+                                <span class="stat-val">24h</span>
+                                <span class="stat-label">Delivery</span>
+                            </div>
+                        </div>
+
+                        <div class="about-section">
+                            <h3>About Service</h3>
+                            <p id="provider-about">We provide eco-friendly, premium washing services using organic detergents. Perfect for daily wear and sensitive fabrics.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-action-bar">
+                    <button class="btn btn-primary full-width" onclick="navigate('booking')">Continue to Booking</button>
+                </div>
+            </section>
+
+            <!-- Booking / Missing UX Screen -->
+            <section id="booking" class="app-screen">
+                <header class="app-header">
+                    <button class="icon-btn back-btn" onclick="navigate('provider')"><ion-icon name="arrow-back-outline"></ion-icon></button>
+                    <h3>Booking Details</h3>
+                    <div style="width:24px"></div>
+                </header>
+
+                <div class="screen-content scrollable">
+                    
+                    <!-- Pickup Toggle -->
+                    <div class="booking-section">
+                        <h3>Service Mode</h3>
+                        <div class="toggle-group">
+                            <div class="toggle-btn active" onclick="selectToggle(this)">
+                                <ion-icon name="car-outline"></ion-icon>
+                                <span>Pickup</span>
+                            </div>
+                            <div class="toggle-btn" onclick="selectToggle(this)">
+                                <ion-icon name="storefront-outline"></ion-icon>
+                                <span>Drop-off</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Itemized Cart / Weight Estimator -->
+                    <div class="booking-section">
+                        <h3>Itemized Laundry Cart</h3>
+                        <div class="cart-container" id="itemized-cart-container">
+                            <div class="cart-item">
+                                <div class="item-info">
+                                    <div class="item-icon"><ion-icon name="shirt-outline"></ion-icon></div>
+                                    <div class="item-text">
+                                        <h4>Shirts</h4>
+                                        <p>~0.2 kg each</p>
+                                    </div>
+                                </div>
+                                <div class="quantity-control">
+                                    <button class="qty-btn" onclick="updateItemQty('shirts', -1)"><ion-icon name="remove"></ion-icon></button>
+                                    <span class="qty-val" id="qty-shirts">0</span>
+                                    <button class="qty-btn" onclick="updateItemQty('shirts', 1)"><ion-icon name="add"></ion-icon></button>
+                                </div>
+                            </div>
+                            <div class="cart-item">
+                                <div class="item-info">
+                                    <div class="item-icon"><ion-icon name="man-outline"></ion-icon></div>
+                                    <div class="item-text">
+                                        <h4>Trousers / Jeans</h4>
+                                        <p>~0.6 kg each</p>
+                                    </div>
+                                </div>
+                                <div class="quantity-control">
+                                    <button class="qty-btn" onclick="updateItemQty('trousers', -1)"><ion-icon name="remove"></ion-icon></button>
+                                    <span class="qty-val" id="qty-trousers">0</span>
+                                    <button class="qty-btn" onclick="updateItemQty('trousers', 1)"><ion-icon name="add"></ion-icon></button>
+                                </div>
+                            </div>
+                            <div class="cart-item">
+                                <div class="item-info">
+                                    <div class="item-icon"><ion-icon name="bed-outline"></ion-icon></div>
+                                    <div class="item-text">
+                                        <h4>Bedsheets</h4>
+                                        <p>~1.0 kg each</p>
+                                    </div>
+                                </div>
+                                <div class="quantity-control">
+                                    <button class="qty-btn" onclick="updateItemQty('bedsheets', -1)"><ion-icon name="remove"></ion-icon></button>
+                                    <span class="qty-val" id="qty-bedsheets">0</span>
+                                    <button class="qty-btn" onclick="updateItemQty('bedsheets', 1)"><ion-icon name="add"></ion-icon></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="weight-summary" style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-elevated); padding: 12px; border-radius: 8px;">
+                            <span style="font-size: 14px; font-weight: 500;">Estimated Weight: </span>
+                            <span class="weight-highlight" style="font-size: 18px; font-weight: 700; color: var(--accent-primary);"><span id="total-weight-calc">0.0</span> kg</span>
+                        </div>
+                    </div>
+
+                    <!-- Special Instructions -->
+                    <div class="booking-section">
+                        <h3>Special Instructions</h3>
+                        <textarea id="special-instructions" placeholder="E.g., Please use hypoallergenic detergent..." style="width: 100%; height: 80px; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; color: var(--text-primary); font-family: inherit; font-size: 14px; outline: none; resize: none;"></textarea>
+                    </div>
+
+                    <!-- Indian Address -->
+                    <div class="booking-section">
+                        <div class="section-header">
+                            <h3>Pickup Address</h3>
+                            <a href="#" class="edit-link" id="edit-address-btn">Edit</a>
+                        </div>
+                        <div class="address-card">
+                            <ion-icon name="location" class="location-pin"></ion-icon>
+                            <div class="address-text">
+                                <h4>Home</h4>
+                                <p id="address-display">B-402, Oberoi Splendor, JVLR,<br>Andheri East, Mumbai 400060</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Schedule -->
+                    <div class="booking-section">
+                        <h3>Select Time</h3>
+                        <div class="time-capsules">
+                            <div class="time-chip active">Today, 4-6 PM</div>
+                            <div class="time-chip">Today, 6-8 PM</div>
+                            <div class="time-chip">Tomorrow, 10-12 AM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-action-bar checkout-bar">
+                    <div class="total-price">
+                        <span class="label">Estimated Total</span>
+                        <span class="val">₹<span id="total-price-val">180</span></span>
+                    </div>
+                    <button class="btn btn-primary" onclick="navigate('payment')">Proceed to Pay</button>
+                </div>
+            </section>
+
+            <!-- Payment Screen -->
+            <section id="payment" class="app-screen">
+                <header class="app-header">
+                    <button class="icon-btn back-btn" onclick="navigate('booking')"><ion-icon name="arrow-back-outline"></ion-icon></button>
+                    <h3>Payment</h3>
+                    <div style="width:24px"></div>
+                </header>
+
+                <div class="screen-content scrollable">
+                    <div class="payment-summary">
+                        <h2 id="payment-total-price">₹180.00</h2>
+                        <p id="payment-provider-name">AquaWash Premium</p>
+                    </div>
+
+                    <div class="booking-section">
+                        <h3>Payment Method</h3>
+                        <div class="payment-methods">
+                            <div class="pay-method active" onclick="selectPayMethod(this)">
+                                <ion-icon name="phone-portrait-outline"></ion-icon>
+                                <span>UPI / GPay</span>
+                                <ion-icon name="checkmark-circle" class="check"></ion-icon>
+                            </div>
+                            <div class="pay-method" onclick="selectPayMethod(this)">
+                                <ion-icon name="card-outline"></ion-icon>
+                                <span>Credit / Debit Card</span>
+                                <ion-icon name="checkmark-circle" class="check"></ion-icon>
+                            </div>
+                            <div class="pay-method" onclick="selectPayMethod(this)">
+                                <ion-icon name="cash-outline"></ion-icon>
+                                <span>Cash on Delivery</span>
+                                <ion-icon name="checkmark-circle" class="check"></ion-icon>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="booking-section">
+                        <h3>Credit / Debit Cards</h3>
+                        <div class="card-input-wrapper">
+                            <div class="input-group">
+                                <label>Card Number</label>
+                                <input type="text" placeholder="XXXX XXXX XXXX XXXX">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-action-bar">
+                    <button class="btn btn-primary full-width" onclick="navigate('tracking')">Pay Now</button>
+                </div>
+            </section>
+
+            <!-- Tracking / Success Screen -->
+            <section id="tracking" class="app-screen">
+                <div class="screen-content success-content">
+                    <div class="success-icon-wrapper">
+                        <ion-icon name="checkmark"></ion-icon>
+                    </div>
+                    <h2>Booking Confirmed!</h2>
+                    <p>Your pickup agent is scheduled for Today between 4-6 PM.</p>
+                    
+                    <div class="tracking-card">
+                        <div class="track-step active">
+                            <div class="dot"></div>
+                            <div class="step-info">
+                                <h4>Booking Accepted</h4>
+                                <p>11:35 AM</p>
+                            </div>
+                        </div>
+                        <div class="track-step">
+                            <div class="dot"></div>
+                            <div class="step-info">
+                                <h4>Agent Assigned</h4>
+                                <p>Pending</p>
+                            </div>
+                        </div>
+                        <div class="track-step">
+                            <div class="dot"></div>
+                            <div class="step-info">
+                                <h4>Out for Pickup</h4>
+                                <p>Pending</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-action-bar">
+                    <button class="btn btn-primary full-width" onclick="navigate('home')">Back to Home</button>
+                </div>
+            </section>
+
+            <!-- Calendar Screen -->
+            <section id="calendar-screen" class="app-screen">
+                <header class="app-header">
+                    <h3>My Bookings</h3>
+                </header>
+                <div class="screen-content scrollable">
+                    <div class="placeholder-content">
+                        <ion-icon name="calendar-outline"></ion-icon>
+                        <h4>No Active Bookings</h4>
+                        <p>Your scheduled bookings will show up here.</p>
+                    </div>
+                </div>
+                <!-- Bottom Nav -->
+                <nav class="bottom-nav">
+                    <a href="#" class="nav-item" onclick="navigate('home')"><ion-icon name="home-outline"></ion-icon></a>
+                    <a href="#" class="nav-item active" onclick="navigate('calendar-screen')"><ion-icon name="calendar"></ion-icon></a>
+                    <a href="#" class="nav-item" onclick="navigate('chat-screen')"><ion-icon name="chatbubble-outline"></ion-icon></a>
+                    <a href="#" class="nav-item" onclick="navigate('profile-screen')"><ion-icon name="person-outline"></ion-icon></a>
+                </nav>
+            </section>
+
+            <!-- Chat Screen -->
+            <section id="chat-screen" class="app-screen">
+                <header class="app-header">
+                    <h3>Chat Support</h3>
+                </header>
+                <div class="screen-content scrollable">
+                    <div class="placeholder-content">
+                        <ion-icon name="chatbubble-outline"></ion-icon>
+                        <h4>No Messages Yet</h4>
+                        <p>Chat with our support or service providers.</p>
+                    </div>
+                </div>
+                <!-- Bottom Nav -->
+                <nav class="bottom-nav">
+                    <a href="#" class="nav-item" onclick="navigate('home')"><ion-icon name="home-outline"></ion-icon></a>
+                    <a href="#" class="nav-item" onclick="navigate('calendar-screen')"><ion-icon name="calendar-outline"></ion-icon></a>
+                    <a href="#" class="nav-item active" onclick="navigate('chat-screen')"><ion-icon name="chatbubble"></ion-icon></a>
+                    <a href="#" class="nav-item" onclick="navigate('profile-screen')"><ion-icon name="person-outline"></ion-icon></a>
+                </nav>
+            </section>
+
+            <!-- Profile Screen -->
+            <section id="profile-screen" class="app-screen">
+                <header class="app-header">
+                    <h3>Profile</h3>
+                </header>
+                <div class="screen-content scrollable">
+                    <div class="profile-info-section">
+                        <div class="user-avatar">
+                            <img src="https://i.pravatar.cc/100?img=12" alt="User">
+                        </div>
+                        <h4>Aditya</h4>
+                        <p>aditya@example.com</p>
+                    </div>
+                    <div class="profile-menu">
+                        <div class="profile-menu-item" onclick="showToast('Loading My Addresses...')">
+                            <span>My Addresses</span>
+                            <ion-icon name="chevron-forward-outline"></ion-icon>
+                        </div>
+                        <div class="profile-menu-item" onclick="showToast('Loading Payment Methods...')">
+                            <span>Payment Methods</span>
+                            <ion-icon name="chevron-forward-outline"></ion-icon>
+                        </div>
+                    </div>
+                </div>
+                <!-- Bottom Nav -->
+                <nav class="bottom-nav">
+                    <a href="#" class="nav-item" onclick="navigate('home')"><ion-icon name="home-outline"></ion-icon></a>
+                    <a href="#" class="nav-item" onclick="navigate('calendar-screen')"><ion-icon name="calendar-outline"></ion-icon></a>
+                    <a href="#" class="nav-item" onclick="navigate('chat-screen')"><ion-icon name="chatbubble-outline"></ion-icon></a>
+                    <a href="#" class="nav-item active" onclick="navigate('profile-screen')"><ion-icon name="person"></ion-icon></a>
+                </nav>
+            </section>
+
+            <!-- Notifications Screen -->
+            <section id="notifications-screen" class="app-screen">
+                <header class="app-header">
+                    <button class="icon-btn back-btn" onclick="navigate('home')"><ion-icon name="arrow-back-outline"></ion-icon></button>
+                    <h3>Notifications</h3>
+                    <div style="width:24px"></div>
+                </header>
+                <div class="screen-content scrollable">
+                    <div class="notification-item">
+                        <ion-icon name="notifications"></ion-icon>
+                        <div>
+                            <h4>Order Picked Up</h4>
+                            <p>Your order has been successfully picked up by our agent.</p>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <ion-icon name="gift"></ion-icon>
+                        <div>
+                            <h4>Welcome Offer!</h4>
+                            <p>Get 20% off on your first order using code PURELOOP20.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

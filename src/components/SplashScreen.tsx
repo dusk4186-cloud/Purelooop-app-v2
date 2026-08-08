@@ -1,0 +1,19 @@
+export default function SplashScreen() {
+  return (
+    <div className="flex flex-col items-center h-full w-full bg-bg-main overflow-hidden">
+      <div className="flex flex-col items-center flex-1 justify-center w-full">
+        <img 
+          src="/image-removebg-preview.png" 
+          alt="PureLoop" 
+          width={220}
+          height={60}
+          fetchPriority="high"
+          className="w-[220px] h-auto object-contain mb-12"
+        />
+        
+        <div className="w-10 h-10 border-4 border-bg-elevated border-t-accent-primary rounded-full animate-spin"></div>
+        <p className="text-[15px] italic text-text-secondary mt-4">Laundry made effortless</p>
+      </div>
+    </div>
+  );
+}
